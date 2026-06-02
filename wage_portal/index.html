@@ -73,6 +73,7 @@
             border-radius: 6px;
             margin-bottom: 20px;
             background-color: #fafafa;
+            display: none; /* מוסתר כברירת מחדל */
         }
 
         .fieldset-title {
@@ -131,8 +132,18 @@
             <input type="text" id="employeeName" name="employeeName" required placeholder="נא להזין שם מלא">
         </div>
 
-        <div class="fieldset-container">
-            <div class="fieldset-title">בקשת טופס 106</div>
+        <div class="form-group">
+            <label for="requestSubject">נושא הבקשה *</label>
+            <select id="requestSubject" name="requestSubject" required onchange="toggleSections()">
+                <option value="">-- נא לבחור נושא --</option>
+                <option value="טופס 106">טופס 106</option>
+                <option value="תלוש שכר">בקשת תלושי שכר</option>
+                <option value="הערה / בקשה כללית">הערה / בקשה כללית</option>
+            </select>
+        </div>
+
+        <div id="section106" class="fieldset-container">
+            <div class="fieldset-title">פרטי בקשת טופס 106</div>
             <div class="row">
                 <div class="col">
                     <label for="form106StartYear">משנה</label>
@@ -159,8 +170,8 @@
             </div>
         </div>
 
-        <div class="fieldset-container">
-            <div class="fieldset-title">בקשת תלושי שכר</div>
+        <div id="sectionSlips" class="fieldset-container">
+            <div class="fieldset-title">פרטי בקשת תלושי שכר</div>
             
             <p style="margin: 0 0 10px 0; font-size: 13px; font-weight: bold;">מחודש ושנה:</p>
             <div class="row" style="margin-bottom: 10px;">
@@ -224,8 +235,8 @@
         </div>
 
         <div class="form-group">
-            <label for="generalRequests">בקשות כלליות / פירוט נוסף</label>
-            <textarea id="generalRequests" name="generalRequests" placeholder="פרט כאן בקשות נוספות (למשל: אישורי העסקה, קרן השתלמות וכד')..."></textarea>
+            <label for="generalRequests">תוכן הבקשה / פירוט נוסף</label>
+            <textarea id="generalRequests" name="generalRequests" placeholder="פרט כאן את בקשתך..."></textarea>
         </div>
 
         <div class="form-group">
@@ -241,6 +252,26 @@
         <button type="submit">שלח בקשה לפורטל</button>
     </form>
 </div>
+
+<script>
+    // פונקציה שמציגה ומסתירה שדות לפי הנושא שנבחר
+    function toggleSections() {
+        var subject = document.getElementById("requestSubject").value;
+        var section106 = document.getElementById("section106");
+        var sectionSlips = document.getElementById("sectionSlips");
+
+        // איפוס תצוגה
+        section106.style.display = "none";
+        sectionSlips.style.display = "none";
+
+        // הצגה לפי הבחירה
+        if (subject === "טופס 106") {
+            section106.style.display = "block";
+        } else if (subject === "תלוש שכר") {
+            sectionSlips.style.display = "block";
+        }
+    }
+</script>
 
 </body>
 </html>
