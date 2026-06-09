@@ -10,6 +10,8 @@
             --secondary-color: #f5f7fa;
             --text-color: #333;
             --border-color: #ccc;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
         }
 
         body {
@@ -113,10 +115,37 @@
             background-color: #357abd;
         }
 
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
         .note {
             font-size: 12px;
             color: #666;
             margin-top: 4px;
+        }
+
+        /* סגנון להודעות המערכת הקופצות */
+        .alert-message {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+
+        .alert-success {
+            background-color: #e8f8f5;
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .alert-error {
+            background-color: #fceae8;
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
         }
     </style>
 </head>
@@ -125,7 +154,9 @@
 <div class="form-container">
     <h2>פורטל שכר - הגשת בקשה</h2>
     
-    <form action="https://hook.eu1.make.com/2d79o32chny5995mdvvc3ok2pa9ov236" method="POST" enctype="multipart/form-data">
+    <div id="alertBox" class="alert-message"></div>
+    
+    <form id="payrollForm" enctype="multipart/form-data">
         
         <div class="form-group">
             <label for="employeeName">שם העובד/ת *</label>
@@ -148,7 +179,7 @@
                 <div class="col">
                     <label for="form106StartYear">משנה</label>
                     <select id="form106StartYear" name="form106StartYear">
-                        <option value="">בחר שנה</option>
+                        <option value="">bחר שנה</option>
                         <option value="2026">2026</option>
                         <option value="2025">2025</option>
                         <option value="2024">2024</option>
@@ -249,7 +280,7 @@
             <div class="note">ניתן לצרף קבצי PDF, תמונות וכד' הרלוונטיים לבקשה.</div>
         </div>
 
-        <button type="submit">שלח בקשה לפורטל</button>
+        <button type="submit" id="submitBtn">שלח בקשה לפורטל</button>
     </form>
 </div>
 
@@ -271,6 +302,52 @@
             sectionSlips.style.display = "block";
         }
     }
+
+    // מנגנון שליחת הטופס המאובטח עם הודעות אישור ושגיאה
+    document.getElementById("payrollForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // מניעת רענון הדף הדיפולטי
+
+        var form = event.target;
+        var submitBtn = document.getElementById("submitBtn");
+        var alertBox = document.getElementById("alertBox");
+        var formData = new FormData(form);
+
+        // שינוי מצב כפתור ומחיקת הודעות קודמות
+        submitBtn.disabled = true;
+        submitBtn.innerText = "שולח בקשה...";
+        alertBox.style.display = "none";
+        alertBox.className = "alert-message";
+
+        // שליחת הנתונים ל-Make ברקע
+        fetch("https://hook.eu1.make.com/2d79o32chny5995mdvvc3ok2pa9ov236", {
+            method: "POST",
+            body: formData
+        })
+        .then(function(response) {
+            if (response.ok) {
+                // במקרה של הצלחה
+                alertBox.innerText = "הבקשה נשלחה בהצלחה! הנתונים הוכנסו לפורטל.";
+                alertBox.classList.add("alert-success");
+                alertBox.style.display = "block";
+                form.reset(); // איפוס השדות בטופס
+                toggleSections(); // הסתרת השדות הדינמיים בחזרה
+            } else {
+                // במקרה של תגובת שרת לא תקינה
+                throw new Error("Server error");
+            }
+        })
+        .catch(function(error) {
+            // במקרה של בעיית רשת או שרת למטה
+            alertBox.innerText = "חלה שגיאה בשליחת הנתונים. אנא נסה שנית או פנה לעדי.";
+            alertBox.classList.add("alert-error");
+            alertBox.style.display = "block";
+        })
+        .finally(function() {
+            // החזרת הכפתור למצב פעיל בכל מקרה
+            submitBtn.disabled = false;
+            submitBtn.innerText = "שלח בקשה לפורטל";
+        });
+    });
 </script>
 
 </body>
