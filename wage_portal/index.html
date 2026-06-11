@@ -75,7 +75,7 @@
             border-radius: 6px;
             margin-bottom: 20px;
             background-color: #fafafa;
-            display: none; /* מוסתר כברירת מחדל */
+            display: none;
         }
 
         .fieldset-title {
@@ -126,7 +126,6 @@
             margin-top: 4px;
         }
 
-        /* סגנון להודעות המערכת הקופצות */
         .alert-message {
             padding: 15px;
             border-radius: 4px;
@@ -160,7 +159,9 @@
         
         <div class="form-group">
             <label for="employeeName">שם העובד/ת *</label>
-            <input type="text" id="employeeName" name="employeeName" required placeholder="נא להזין שם מלא">
+            <select id="employeeName" name="employeeName" required>
+                <option value="">-- בוען רשימת עובדים... --</option>
+            </select>
         </div>
 
         <div class="form-group">
@@ -179,7 +180,7 @@
                 <div class="col">
                     <label for="form106StartYear">משנה</label>
                     <select id="form106StartYear" name="form106StartYear">
-                        <option value="">bחר שנה</option>
+                        <option value="">בחר שנה</option>
                         <option value="2026">2026</option>
                         <option value="2025">2025</option>
                         <option value="2024">2024</option>
@@ -285,17 +286,55 @@
 </div>
 
 <script>
-    // פונקציה שמציגה ומסתירה שדות לפי הנושא שנבחר
+    // מזהה קובץ הגוגל שיטס שלך (נלקח אוטומטית לפי המערכת שלך)
+    const SPREADSHEET_ID = "1g7y373-hT_mC0W3pGAn_8oB1j4Gv89b-t_qM7Zf4mY8"; 
+    // שם הלשונית המדויק שבה נמצאים העובדים
+    const SHEET_NAME = "עובדים"; 
+
+    // פונקציה שרצה מיד עם טעינת הדף ומושכת את השמות מגוגל שיטס באופן דינמי
+    window.addEventListener("DOMContentLoaded", function() {
+        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+        const employeeSelect = document.getElementById("employeeName");
+
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                // פירוק ה-CSV לשורות ונקה גרשיים
+                const rows = data.split("\n");
+                
+                // איפוס ה-Drop-down
+                employeeSelect.innerHTML = '<option value="">-- נא לבחור שם מהרשימה --</option>';
+                
+                // לולאה שעוברת על השורות (מדלגת על שורת הכותרת הראשונה "שם עובד")
+                for (let i = 1; i < rows.length; i++) {
+                    if (!rows[i]) continue;
+                    
+                    // לקיחת העמודה הראשונה (שם העובד) וניקוי גרשיים קבועים של גוגל
+                    const columns = rows[i].split(",");
+                    const employeeName = columns[0].replace(/^"|"$/g, '').trim();
+                    
+                    if (employeeName && employeeName !== "") {
+                        const option = document.createElement("option");
+                        option.value = employeeName;
+                        option.textContent = employeeName;
+                        employeeSelect.appendChild(option);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error("Error loading employees:", error);
+                employeeSelect.innerHTML = '<option value="">שגיאה בטעינת עובדים, נא לרענן</option>';
+            });
+    });
+
     function toggleSections() {
         var subject = document.getElementById("requestSubject").value;
         var section106 = document.getElementById("section106");
         var sectionSlips = document.getElementById("sectionSlips");
 
-        // איפוס תצוגה
         section106.style.display = "none";
         sectionSlips.style.display = "none";
 
-        // הצגה לפי הבחירה
         if (subject === "טופס 106") {
             section106.style.display = "block";
         } else if (subject === "תלוש שכר") {
@@ -303,47 +342,40 @@
         }
     }
 
-    // מנגנון שליחת הטופס המאובטח עם הודעות אישור ושגיאה
     document.getElementById("payrollForm").addEventListener("submit", function(event) {
-        event.preventDefault(); // מניעת רענון הדף הדיפולטי
+        event.preventDefault();
 
         var form = event.target;
         var submitBtn = document.getElementById("submitBtn");
         var alertBox = document.getElementById("alertBox");
         var formData = new FormData(form);
 
-        // שינוי מצב כפתור ומחיקת הודעות קודמות
         submitBtn.disabled = true;
         submitBtn.innerText = "שולח בקשה...";
         alertBox.style.display = "none";
         alertBox.className = "alert-message";
 
-        // שליחת הנתונים ל-Make ברקע
         fetch("https://hook.eu1.make.com/2d79o32chny5995mdvvc3ok2pa9ov236", {
             method: "POST",
             body: formData
         })
         .then(function(response) {
             if (response.ok) {
-                // במקרה של הצלחה
                 alertBox.innerText = "הבקשה נשלחה בהצלחה! הנתונים הוכנסו לפורטל.";
                 alertBox.classList.add("alert-success");
                 alertBox.style.display = "block";
-                form.reset(); // איפוס השדות בטופס
-                toggleSections(); // הסתרת השדות הדינמיים בחזרה
+                form.reset();
+                toggleSections();
             } else {
-                // במקרה של תגובת שרת לא תקינה
                 throw new Error("Server error");
             }
         })
         .catch(function(error) {
-            // במקרה של בעיית רשת או שרת למטה
             alertBox.innerText = "חלה שגיאה בשליחת הנתונים. אנא נסה שנית או פנה לעדי.";
             alertBox.classList.add("alert-error");
             alertBox.style.display = "block";
         })
         .finally(function() {
-            // החזרת הכפתור למצב פעיל בכל מקרה
             submitBtn.disabled = false;
             submitBtn.innerText = "שלח בקשה לפורטל";
         });
