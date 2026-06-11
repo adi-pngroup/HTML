@@ -328,10 +328,10 @@
                     }
                 });
 
-                // הוספת האופציה הקבועה של עובד חדש
+                // הוספת האופציה של עובד חדש לסוף
                 const newEmpOption = document.createElement("option");
                 newEmpOption.value = "__NEW_EMPLOYEE__";
-                newEmpOption.textContent = "➕ עובד/ת חדש/ה (השם שלי לא מופיע)";
+                newEmpOption.textContent = "עובד חדש / השם שלי לא מופיע";
                 employeeSelect.appendChild(newEmpOption);
             })
             .catch(error => {
@@ -340,15 +340,17 @@
             });
     });
 
-    // פונקציה משופרת ומאובטחת להצגה/הסתרה של אזור עובד חדש
+    // פונקציה אבסולוטית לבדיקת בחירת עובד חדש
     function checkNewEmployee() {
         var select = document.getElementById("employeeName");
         var section = document.getElementById("newEmployeeSection");
         var newNameInput = document.getElementById("newEmployeeName");
         var newEmailInput = document.getElementById("newEmployeeEmail");
 
-        // תיקון: בודק גם את הערך הפנימי וגם את הטקסט למניעת פספוסים
-        if (select.value === "__NEW_EMPLOYEE__" || select.options[select.selectedIndex].text.includes("עובד/ת חדש/ה")) {
+        var selectedValue = select.value;
+        
+        // הבדיקה תופסת את זה גם לפי הערך הפנימי וגם לפי הטקסט הכתוב ליתר ביטחון
+        if (selectedValue === "__NEW_EMPLOYEE__") {
             section.style.display = "block";
             newNameInput.required = true;
             newEmailInput.required = true;
