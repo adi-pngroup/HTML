@@ -78,7 +78,6 @@
             background-color: #fafafa;
         }
 
-        /* מוסרת כברירת מחדל */
         #newEmployeeSection {
             display: none; 
             border-color: #f39c12; 
@@ -154,7 +153,6 @@
             border: 1px solid var(--error-color);
         }
 
-        /* עיצוב ייעודי להודעת שגיאה על שם קיים */
         .validation-error {
             color: var(--error-color);
             font-size: 13px;
@@ -319,7 +317,6 @@
     const SPREADSHEET_ID = "1k3kyQX2usPvs5xe6q1203CUZS1rcRQcp2E_H8CMVu8M"; 
     const SHEET_GID = "1812873594"; 
     
-    // משתנה גלובלי שיחזיק את רשימת השמות הקיימים לצורך בדיקה
     let existingEmployees = [];
 
     window.addEventListener("DOMContentLoaded", function() {
@@ -334,7 +331,7 @@
                 const rows = json.table.rows;
                 
                 employeeSelect.innerHTML = '<option value="">-- נא לבחור שם מהרשימה --</option>';
-                existingEmployees = []; // איפוס הרשימה
+                existingEmployees = [];
                 
                 rows.forEach(row => {
                     if (row.c && row.c[0] && row.c[0].v) {
@@ -348,19 +345,19 @@
                 // מיון השמות לעברית
                 existingEmployees.sort((a, b) => a.localeCompare(b, 'he'));
 
-                // הזרקה לדרופדאון
+                // הזרקת האופציה של עובד חדש בראש הרשימה (ראשון בתור!)
+                const newEmpOption = document.createElement("option");
+                newEmpOption.value = "__NEW_EMPLOYEE__";
+                newEmpOption.textContent = "⭐ עובד חדש / השם שלי לא מופיע";
+                employeeSelect.appendChild(newEmpOption);
+
+                // הזרקת שאר השמות הממוינים מא' עד ת'
                 existingEmployees.forEach(name => {
                     const option = document.createElement("option");
                     option.value = name;
                     option.textContent = name;
                     employeeSelect.appendChild(option);
                 });
-
-                // הוספת האופציה של עובד חדש בסוף
-                const newEmpOption = document.createElement("option");
-                newEmpOption.value = "__NEW_EMPLOYEE__";
-                newEmpOption.textContent = "עובד חדש / השם שלי לא מופיע";
-                employeeSelect.appendChild(newEmpOption);
             })
             .catch(error => {
                 console.error("Error loading employees:", error);
@@ -377,7 +374,7 @@
             section.style.display = "block";
             newNameInput.required = true;
             newEmailInput.required = true;
-            validateUniqueName(newNameInput.value); // הרצת בדיקה ראשונית
+            validateUniqueName(newNameInput.value);
         } else {
             section.style.display = "none";
             newNameInput.required = false;
@@ -389,24 +386,21 @@
         }
     }
 
-    // פונקציית וולידציה חכמה למניעת שמות כפולים
     function validateUniqueName(typedName) {
         const trimmedName = typedName.trim();
         const errorBox = document.getElementById("nameErrorBox");
         const submitBtn = document.getElementById("submitBtn");
         const select = document.getElementById("employeeName");
 
-        // רלוונטי רק אם נבחר עובד חדש ויש טקסט בתיבה
         if (select.value === "__NEW_EMPLOYEE__" && trimmedName.length > 0) {
-            // בדיקה האם השם שהוקלד קיים כבר במערך השמות (ללא הבדל רווחים כפולים)
             const nameExists = existingEmployees.some(emp => emp.toLowerCase() === trimmedName.toLowerCase());
 
             if (nameExists) {
-                errorBox.style.display = "block"; // הצגת השגיאה האדומה
-                submitBtn.disabled = true;        // חסימת כפתור השליחה
+                errorBox.style.display = "block";
+                submitBtn.disabled = true;
             } else {
-                errorBox.style.display = "none";  // הסרת השגיאה
-                submitBtn.disabled = false;       // שחרור כפתור השליחה
+                errorBox.style.display = "none";
+                submitBtn.disabled = false;
             }
         } else {
             errorBox.style.display = "none";
