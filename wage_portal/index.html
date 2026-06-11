@@ -286,19 +286,19 @@
 </div>
 
 <script>
-    // מזהה קובץ הגוגל שיטס שלך
-    const SPREADSHEET_ID = "1g7y373-hT_mC0W3pGAn_8oB1j4Gv89b-t_qM7Zf4mY8"; 
+    // ה-ID המדויק של קובץ ה-notification_system שלך
+    const SPREADSHEET_ID = "1k3kyQX2usPvs5xe6q1203CUZS1rcRQcp2E_H8CMVu8M"; 
+    // מזהה הלשונית המדויק של "עובדים" (מתוך ה-URL ששלחת)
+    const SHEET_GID = "1812873594"; 
     
-    // בדיקה דינמית קלה לטעינת השמות
     window.addEventListener("DOMContentLoaded", function() {
-        // שימוש במנגנון ה-Visualization הכללי של גוגל שלא תלוי בשם הלשונית המדויק
-        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
+        // פנייה ישירות ללשונית "עובדים" באמצעות ה-gid שלה
+        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
         const employeeSelect = document.getElementById("employeeName");
 
         fetch(url)
             .then(response => response.text())
             .then(txt => {
-                // ניקוי עטיפת ה-JSON שגוגל מחזירה
                 const jsonString = txt.substring(txt.indexOf('{'), txt.lastIndexOf('}') + 1);
                 const json = JSON.parse(jsonString);
                 const rows = json.table.rows;
@@ -308,8 +308,8 @@
                 rows.forEach(row => {
                     if (row.c && row.c[0] && row.c[0].v) {
                         const name = row.c[0].v.toString().trim();
-                        // סינון שורת הכותרת "שם עובד" במידה וקיימת
-                        if (name && name !== "שם עובד") {
+                        // סינון כותרת עמודה במידה וקיימת
+                        if (name && name !== "שם עובד" && name !== "שם העובד") {
                             const option = document.createElement("option");
                             option.value = name;
                             option.textContent = name;
@@ -319,7 +319,7 @@
                 });
 
                 if (employeeSelect.options.length <= 1) {
-                    employeeSelect.innerHTML = '<option value="">לא נמצאו עובדים בלשונית הראשונה</option>';
+                    employeeSelect.innerHTML = '<option value="">לא נמצאו שמות בלשונית עובדים</option>';
                 }
             })
             .catch(error => {
