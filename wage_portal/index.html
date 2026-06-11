@@ -157,11 +157,13 @@
     
     <form id="payrollForm" enctype="multipart/form-data">
         
+        <!-- השדה שונה כאן לתיבת טקסט המחוברת לרשימת חיפוש דינמית -->
         <div class="form-group">
             <label for="employeeName">שם העובד/ת *</label>
-            <select id="employeeName" name="employeeName" required>
-                <option value="">-- טוען רשימת עובדים... --</option>
-            </select>
+            <input type="text" id="employeeName" name="employeeName" required list="employeeList" placeholder="הקלד לחיפוש שם או בחר מהרשימה">
+            <datalist id="employeeList">
+                <!-- השמות יוכנסו כאן אוטומטית מגוגל שיטס -->
+            </datalist>
         </div>
 
         <div class="form-group">
@@ -286,15 +288,13 @@
 </div>
 
 <script>
-    // ה-ID המדויק של קובץ ה-notification_system שלך
     const SPREADSHEET_ID = "1k3kyQX2usPvs5xe6q1203CUZS1rcRQcp2E_H8CMVu8M"; 
-    // מזהה הלשונית המדויק של "עובדים" (מתוך ה-URL ששלחת)
     const SHEET_GID = "1812873594"; 
     
     window.addEventListener("DOMContentLoaded", function() {
-        // פנייה ישירות ללשונית "עובדים" באמצעות ה-gid שלה
         const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
-        const employeeSelect = document.getElementById("employeeName");
+        const employeeList = document.getElementById("employeeList");
+        const employeeInput = document.getElementById("employeeName");
 
         fetch(url)
             .then(response => response.text())
@@ -303,28 +303,27 @@
                 const json = JSON.parse(jsonString);
                 const rows = json.table.rows;
                 
-                employeeSelect.innerHTML = '<option value="">-- נא לבחור שם מהרשימה --</option>';
+                // איפוס רשימת האפשרויות בתוך ה-datalist
+                employeeList.innerHTML = '';
                 
                 rows.forEach(row => {
                     if (row.c && row.c[0] && row.c[0].v) {
                         const name = row.c[0].v.toString().trim();
-                        // סינון כותרת עמודה במידה וקיימת
                         if (name && name !== "שם עובד" && name !== "שם העובד") {
                             const option = document.createElement("option");
-                            option.value = name;
-                            option.textContent = name;
-                            employeeSelect.appendChild(option);
+                            option.value = name; // מה שייבחר ויוצג בחיפוש
+                            employeeList.appendChild(option);
                         }
                     }
                 });
 
-                if (employeeSelect.options.length <= 1) {
-                    employeeSelect.innerHTML = '<option value="">לא נמצאו שמות בלשונית עובדים</option>';
+                if (employeeList.children.length === 0) {
+                    employeeInput.placeholder = "לא נמצאו שמות בגוגל שיטס";
                 }
             })
             .catch(error => {
                 console.error("Error loading employees:", error);
-                employeeSelect.innerHTML = '<option value="">שגיאה בטעינת עובדים, נא לרענן</option>';
+                employeeInput.placeholder = "שגיאה בטעינת עובדים, נא לרענן";
             });
     });
 
