@@ -76,7 +76,13 @@
             border-radius: 6px;
             margin-bottom: 20px;
             background-color: #fafafa;
-            display: none;
+        }
+
+        /* מוסתר כברירת מחדל */
+        #newEmployeeSection {
+            display: none; 
+            border-color: #f39c12; 
+            background-color: #fafafa;
         }
 
         .fieldset-title {
@@ -160,13 +166,13 @@
         
         <div class="form-group">
             <label for="employeeName">שם העובד/ת *</label>
-            <select id="employeeName" name="employeeName" required onchange="checkNewEmployee()">
+            <select id="employeeName" name="employeeName" required onchange="checkNewEmployeeCSS(this.value)">
                 <option value="">-- טוען רשימת עובדים... --</option>
             </select>
         </div>
 
-        <div id="newEmployeeSection" class="fieldset-container" style="border-color: #f39c12;">
-            <div class="fieldset-title" style="color: #e67e22;">רישום עובד חדש במערכת</div>
+        <div id="newEmployeeSection" class="fieldset-container">
+            <div class="fieldset-title" style="color: #e67e22;">רישום עובד חדש במערכת *</div>
             <p style="margin: 0 0 12px 0; font-size: 13px; color: #666;">השם שלך לא נמצא ברשימה? מלא את פרטייך כאן והמערכת תעדכן אותך אוטומטית בפעם הבאה.</p>
             <div class="form-group">
                 <label for="newEmployeeName">שם מלא בעברית *</label>
@@ -188,7 +194,7 @@
             </select>
         </div>
 
-        <div id="section106" class="fieldset-container">
+        <div id="section106" class="fieldset-container" style="display: none;">
             <div class="fieldset-title">פרטי בקשת טופס 106</div>
             <div class="row">
                 <div class="col">
@@ -216,7 +222,7 @@
             </div>
         </div>
 
-        <div id="sectionSlips" class="fieldset-container">
+        <div id="sectionSlips" class="fieldset-container" style="display: none;">
             <div class="fieldset-title">פרטי בקשת תלושי שכר</div>
             
             <p style="margin: 0 0 10px 0; font-size: 13px; font-weight: bold;">מחודש ושנה:</p>
@@ -328,7 +334,7 @@
                     }
                 });
 
-                // הוספת האופציה של עובד חדש לסוף
+                // הוספת האופציה של עובד חדש
                 const newEmpOption = document.createElement("option");
                 newEmpOption.value = "__NEW_EMPLOYEE__";
                 newEmpOption.textContent = "עובד חדש / השם שלי לא מופיע";
@@ -340,17 +346,13 @@
             });
     });
 
-    // פונקציה אבסולוטית לבדיקת בחירת עובד חדש
-    function checkNewEmployee() {
-        var select = document.getElementById("employeeName");
+    // פונקציית פתיחה ישירה וחסינת תקלות
+    function checkNewEmployeeCSS(val) {
         var section = document.getElementById("newEmployeeSection");
         var newNameInput = document.getElementById("newEmployeeName");
         var newEmailInput = document.getElementById("newEmployeeEmail");
 
-        var selectedValue = select.value;
-        
-        // הבדיקה תופסת את זה גם לפי הערך הפנימי וגם לפי הטקסט הכתוב ליתר ביטחון
-        if (selectedValue === "__NEW_EMPLOYEE__") {
+        if (val === "__NEW_EMPLOYEE__") {
             section.style.display = "block";
             newNameInput.required = true;
             newEmailInput.required = true;
@@ -402,7 +404,7 @@
                 alertBox.style.display = "block";
                 form.reset();
                 toggleSections();
-                checkNewEmployee(); 
+                checkNewEmployeeCSS(""); 
             } else {
                 throw new Error("Server error");
             }
