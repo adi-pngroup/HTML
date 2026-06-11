@@ -160,7 +160,7 @@
         <div class="form-group">
             <label for="employeeName">שם העובד/ת *</label>
             <select id="employeeName" name="employeeName" required>
-                <option value="">-- בוען רשימת עובדים... --</option>
+                <option value="">-- טוען רשימת עובדים... --</option>
             </select>
         </div>
 
@@ -286,39 +286,40 @@
 </div>
 
 <script>
-    // מזהה קובץ הגוגל שיטס שלך (נלקח אוטומטית לפי המערכת שלך)
+    // מזהה קובץ הגוגל שיטס שלך
     const SPREADSHEET_ID = "1g7y373-hT_mC0W3pGAn_8oB1j4Gv89b-t_qM7Zf4mY8"; 
-    // שם הלשונית המדויק שבה נמצאים העובדים
-    const SHEET_NAME = "עובדים"; 
-
-    // פונקציה שרצה מיד עם טעינת הדף ומושכת את השמות מגוגל שיטס באופן דינמי
+    
+    // בדיקה דינמית קלה לטעינת השמות
     window.addEventListener("DOMContentLoaded", function() {
-        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+        // שימוש במנגנון ה-Visualization הכללי של גוגל שלא תלוי בשם הלשונית המדויק
+        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
         const employeeSelect = document.getElementById("employeeName");
 
         fetch(url)
             .then(response => response.text())
-            .then(data => {
-                // פירוק ה-CSV לשורות ונקה גרשיים
-                const rows = data.split("\n");
+            .then(txt => {
+                // ניקוי עטיפת ה-JSON שגוגל מחזירה
+                const jsonString = txt.substring(txt.indexOf('{'), txt.lastIndexOf('}') + 1);
+                const json = JSON.parse(jsonString);
+                const rows = json.table.rows;
                 
-                // איפוס ה-Drop-down
                 employeeSelect.innerHTML = '<option value="">-- נא לבחור שם מהרשימה --</option>';
                 
-                // לולאה שעוברת על השורות (מדלגת על שורת הכותרת הראשונה "שם עובד")
-                for (let i = 1; i < rows.length; i++) {
-                    if (!rows[i]) continue;
-                    
-                    // לקיחת העמודה הראשונה (שם העובד) וניקוי גרשיים קבועים של גוגל
-                    const columns = rows[i].split(",");
-                    const employeeName = columns[0].replace(/^"|"$/g, '').trim();
-                    
-                    if (employeeName && employeeName !== "") {
-                        const option = document.createElement("option");
-                        option.value = employeeName;
-                        option.textContent = employeeName;
-                        employeeSelect.appendChild(option);
+                rows.forEach(row => {
+                    if (row.c && row.c[0] && row.c[0].v) {
+                        const name = row.c[0].v.toString().trim();
+                        // סינון שורת הכותרת "שם עובד" במידה וקיימת
+                        if (name && name !== "שם עובד") {
+                            const option = document.createElement("option");
+                            option.value = name;
+                            option.textContent = name;
+                            employeeSelect.appendChild(option);
+                        }
                     }
+                });
+
+                if (employeeSelect.options.length <= 1) {
+                    employeeSelect.innerHTML = '<option value="">לא נמצאו עובדים בלשונית הראשונה</option>';
                 }
             })
             .catch(error => {
