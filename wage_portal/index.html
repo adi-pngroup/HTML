@@ -54,6 +54,7 @@
         }
 
         input[type="text"],
+        input[type="email"],
         select,
         textarea {
             width: 100%;
@@ -157,13 +158,24 @@
     
     <form id="payrollForm" enctype="multipart/form-data">
         
-        <!-- השדה שונה כאן לתיבת טקסט המחוברת לרשימת חיפוש דינמית -->
         <div class="form-group">
             <label for="employeeName">שם העובד/ת *</label>
-            <input type="text" id="employeeName" name="employeeName" required list="employeeList" placeholder="הקלד לחיפוש שם או בחר מהרשימה">
-            <datalist id="employeeList">
-                <!-- השמות יוכנסו כאן אוטומטית מגוגל שיטס -->
-            </datalist>
+            <select id="employeeName" name="employeeName" required onchange="checkNewEmployee()">
+                <option value="">-- טוען רשימת עובדים... --</option>
+            </select>
+        </div>
+
+        <div id="newEmployeeSection" class="fieldset-container" style="border-color: #f39c12;">
+            <div class="fieldset-title" style="color: #e67e22;">רישום עובד חדש במערכת</div>
+            <p style="margin: 0 0 12px 0; font-size: 13px; color: #666;">השם שלך לא נמצא ברשימה? מלא את פרטייך כאן והמערכת תעדכן אותך אוטומטית בפעם הבאה.</p>
+            <div class="form-group">
+                <label for="newEmployeeName">שם מלא בעברית *</label>
+                <input type="text" id="newEmployeeName" name="newEmployeeName" placeholder="לדוגמה: ישראל ישראלי">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="newEmployeeEmail">כתובת מייל לקבלת עדכונים *</label>
+                <input type="email" id="newEmployeeEmail" name="newEmployeeEmail" placeholder="username@pngroup.co.il">
+            </div>
         </div>
 
         <div class="form-group">
@@ -293,8 +305,7 @@
     
     window.addEventListener("DOMContentLoaded", function() {
         const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
-        const employeeList = document.getElementById("employeeList");
-        const employeeInput = document.getElementById("employeeName");
+        const employeeSelect = document.getElementById("employeeName");
 
         fetch(url)
             .then(response => response.text())
@@ -303,29 +314,51 @@
                 const json = JSON.parse(jsonString);
                 const rows = json.table.rows;
                 
-                // איפוס רשימת האפשרויות בתוך ה-datalist
-                employeeList.innerHTML = '';
+                employeeSelect.innerHTML = '<option value="">-- נא לבחור שם מהרשימה --</option>';
                 
                 rows.forEach(row => {
                     if (row.c && row.c[0] && row.c[0].v) {
                         const name = row.c[0].v.toString().trim();
                         if (name && name !== "שם עובד" && name !== "שם העובד") {
                             const option = document.createElement("option");
-                            option.value = name; // מה שייבחר ויוצג בחיפוש
-                            employeeList.appendChild(option);
+                            option.value = name;
+                            option.textContent = name;
+                            employeeSelect.appendChild(option);
                         }
                     }
                 });
 
-                if (employeeList.children.length === 0) {
-                    employeeInput.placeholder = "לא נמצאו שמות בגוגל שיטס";
-                }
+                // הוספת האופציה הקבועה של עובד חדש בסוף הרשימה
+                const newEmpOption = document.createElement("option");
+                newEmpOption.value = "__NEW_EMPLOYEE__";
+                newEmpOption.textContent = "➕ עובד/ת חדש/ה (השם שלי לא מופיע)";
+                employeeSelect.appendChild(newEmpOption);
             })
             .catch(error => {
                 console.error("Error loading employees:", error);
-                employeeInput.placeholder = "שגיאה בטעינת עובדים, נא לרענן";
+                employeeSelect.innerHTML = '<option value="">שגיאה בטעינת עובדים, נא לרענן</option>';
             });
     });
+
+    // פונקציה שמציגה ומסתירה את שדות הרישום לעובד חדש
+    function checkNewEmployee() {
+        var select = document.getElementById("employeeName");
+        var section = document.getElementById("newEmployeeSection");
+        var newNameInput = document.getElementById("newEmployeeName");
+        var newEmailInput = document.getElementById("newEmployeeEmail");
+
+        if (select.value === "__NEW_EMPLOYEE__") {
+            section.style.display = "block";
+            newNameInput.required = true;
+            newEmailInput.required = true;
+        } else {
+            section.style.display = "none";
+            newNameInput.required = false;
+            newEmailInput.required = false;
+            newNameInput.value = "";
+            newEmailInput.value = "";
+        }
+    }
 
     function toggleSections() {
         var subject = document.getElementById("requestSubject").value;
@@ -366,6 +399,7 @@
                 alertBox.style.display = "block";
                 form.reset();
                 toggleSections();
+                checkNewEmployee(); // איפוס תצוגת עובד חדש
             } else {
                 throw new Error("Server error");
             }
