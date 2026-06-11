@@ -78,7 +78,7 @@
             background-color: #fafafa;
         }
 
-        /* מוסתר כברירת מחדל */
+        /* מוסרת כברירת מחדל */
         #newEmployeeSection {
             display: none; 
             border-color: #f39c12; 
@@ -153,6 +153,15 @@
             color: var(--error-color);
             border: 1px solid var(--error-color);
         }
+
+        /* עיצוב ייעודי להודעת שגיאה על שם קיים */
+        .validation-error {
+            color: var(--error-color);
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 5px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -176,7 +185,8 @@
             <p style="margin: 0 0 12px 0; font-size: 13px; color: #666;">השם שלך לא נמצא ברשימה? מלא את פרטייך כאן והמערכת תעדכן אותך אוטומטית בפעם הבאה.</p>
             <div class="form-group">
                 <label for="newEmployeeName">שם מלא בעברית *</label>
-                <input type="text" id="newEmployeeName" name="newEmployeeName" placeholder="לדוגמה: ישראל ישראלי">
+                <input type="text" id="newEmployeeName" name="newEmployeeName" placeholder="לדוגמה: ישראל ישראלי" oninput="validateUniqueName(this.value)">
+                <div id="nameErrorBox" class="validation-error">⚠️ עובד עם שם זה כבר קיים ברשימה! נא לבחור את שמך מתוך הרשימה למעלה.</div>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
                 <label for="newEmployeeEmail">כתובת מייל לקבלת עדכונים *</label>
@@ -309,6 +319,9 @@
     const SPREADSHEET_ID = "1k3kyQX2usPvs5xe6q1203CUZS1rcRQcp2E_H8CMVu8M"; 
     const SHEET_GID = "1812873594"; 
     
+    // משתנה גלובלי שיחזיק את רשימת השמות הקיימים לצורך בדיקה
+    let existingEmployees = [];
+
     window.addEventListener("DOMContentLoaded", function() {
         const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
         const employeeSelect = document.getElementById("employeeName");
@@ -321,31 +334,29 @@
                 const rows = json.table.rows;
                 
                 employeeSelect.innerHTML = '<option value="">-- נא לבחור שם מהרשימה --</option>';
-                
-                // מערך זמני שיכיל את כל השמות שחזרו מגוגל שיטס
-                let namesArray = [];
+                existingEmployees = []; // איפוס הרשימה
                 
                 rows.forEach(row => {
                     if (row.c && row.c[0] && row.c[0].v) {
                         const name = row.c[0].v.toString().trim();
                         if (name && name !== "שם עובד" && name !== "שם העובד") {
-                            namesArray.push(name);
+                            existingEmployees.push(name);
                         }
                     }
                 });
 
-                // מיון חכם מותאם לעברית (Locale-aware sort)
-                namesArray.sort((a, b) => a.localeCompare(b, 'he'));
+                // מיון השמות לעברית
+                existingEmployees.sort((a, b) => a.localeCompare(b, 'he'));
 
-                // הזרקת השמות הממוינים לתוך ה-Dropdown
-                namesArray.forEach(name => {
+                // הזרקה לדרופדאון
+                existingEmployees.forEach(name => {
                     const option = document.createElement("option");
                     option.value = name;
                     option.textContent = name;
                     employeeSelect.appendChild(option);
                 });
 
-                // הוספת האופציה הקבועה של עובד חדש בסוף הרשימה (כדי שלא תתמיין באמצע)
+                // הוספת האופציה של עובד חדש בסוף
                 const newEmpOption = document.createElement("option");
                 newEmpOption.value = "__NEW_EMPLOYEE__";
                 newEmpOption.textContent = "עובד חדש / השם שלי לא מופיע";
@@ -366,12 +377,42 @@
             section.style.display = "block";
             newNameInput.required = true;
             newEmailInput.required = true;
+            validateUniqueName(newNameInput.value); // הרצת בדיקה ראשונית
         } else {
             section.style.display = "none";
             newNameInput.required = false;
             newEmailInput.required = false;
             newNameInput.value = "";
             newEmailInput.value = "";
+            document.getElementById("nameErrorBox").style.display = "none";
+            document.getElementById("submitBtn").disabled = false;
+        }
+    }
+
+    // פונקציית וולידציה חכמה למניעת שמות כפולים
+    function validateUniqueName(typedName) {
+        const trimmedName = typedName.trim();
+        const errorBox = document.getElementById("nameErrorBox");
+        const submitBtn = document.getElementById("submitBtn");
+        const select = document.getElementById("employeeName");
+
+        // רלוונטי רק אם נבחר עובד חדש ויש טקסט בתיבה
+        if (select.value === "__NEW_EMPLOYEE__" && trimmedName.length > 0) {
+            // בדיקה האם השם שהוקלד קיים כבר במערך השמות (ללא הבדל רווחים כפולים)
+            const nameExists = existingEmployees.some(emp => emp.toLowerCase() === trimmedName.toLowerCase());
+
+            if (nameExists) {
+                errorBox.style.display = "block"; // הצגת השגיאה האדומה
+                submitBtn.disabled = true;        // חסימת כפתור השליחה
+            } else {
+                errorBox.style.display = "none";  // הסרת השגיאה
+                submitBtn.disabled = false;       // שחרור כפתור השליחה
+            }
+        } else {
+            errorBox.style.display = "none";
+            if (submitBtn.innerText !== "שולח בקשה...") {
+                submitBtn.disabled = false;
+            }
         }
     }
 
@@ -425,8 +466,10 @@
             alertBox.style.display = "block";
         })
         .finally(function() {
-            submitBtn.disabled = false;
-            submitBtn.innerText = "שלח בקשה לפורטל";
+            if (document.getElementById("nameErrorBox").style.display !== "block") {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "שלח בקשה לפורטל";
+            }
         });
     });
 </script>
