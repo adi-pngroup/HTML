@@ -322,19 +322,30 @@
                 
                 employeeSelect.innerHTML = '<option value="">-- נא לבחור שם מהרשימה --</option>';
                 
+                // מערך זמני שיכיל את כל השמות שחזרו מגוגל שיטס
+                let namesArray = [];
+                
                 rows.forEach(row => {
                     if (row.c && row.c[0] && row.c[0].v) {
                         const name = row.c[0].v.toString().trim();
                         if (name && name !== "שם עובד" && name !== "שם העובד") {
-                            const option = document.createElement("option");
-                            option.value = name;
-                            option.textContent = name;
-                            employeeSelect.appendChild(option);
+                            namesArray.push(name);
                         }
                     }
                 });
 
-                // הוספת האופציה של עובד חדש
+                // מיון חכם מותאם לעברית (Locale-aware sort)
+                namesArray.sort((a, b) => a.localeCompare(b, 'he'));
+
+                // הזרקת השמות הממוינים לתוך ה-Dropdown
+                namesArray.forEach(name => {
+                    const option = document.createElement("option");
+                    option.value = name;
+                    option.textContent = name;
+                    employeeSelect.appendChild(option);
+                });
+
+                // הוספת האופציה הקבועה של עובד חדש בסוף הרשימה (כדי שלא תתמיין באמצע)
                 const newEmpOption = document.createElement("option");
                 newEmpOption.value = "__NEW_EMPLOYEE__";
                 newEmpOption.textContent = "עובד חדש / השם שלי לא מופיע";
@@ -346,7 +357,6 @@
             });
     });
 
-    // פונקציית פתיחה ישירה וחסינת תקלות
     function checkNewEmployeeCSS(val) {
         var section = document.getElementById("newEmployeeSection");
         var newNameInput = document.getElementById("newEmployeeName");
