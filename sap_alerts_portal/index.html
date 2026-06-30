@@ -24,6 +24,14 @@
                 <option value="">-- טוען התראות... --</option>
             </select>
         </div>
+
+        <div class="form-group">
+            <label for="userSelect">בחר משתמש *</label>
+            <select id="userSelect" name="userEmail" required>
+                <option value="">-- טוען משתמשים... --</option>
+            </select>
+        </div>
+
         <div class="form-group">
             <label for="actionSelect">בחר פעולה *</label>
             <select id="actionSelect" name="action" required>
@@ -37,26 +45,40 @@
 </div>
 
 <script>
-    const webhookUrl = "https://hook.eu1.make.com/da6jn8y8eospwzeh329t3544mh7jagr1";
+    const alertsWebhook = "https://hook.eu1.make.com/da6jn8y8eospwzeh329t3544mh7jagr1";
+    const usersWebhook = "https://hook.eu1.make.com/s78by5k7katgk4r3m2a32xaycu8bfexl";
 
     window.addEventListener("DOMContentLoaded", function() {
         const alertSelect = document.getElementById("alertSelect");
+        const userSelect = document.getElementById("userSelect");
 
-        fetch(webhookUrl)
-            .then(response => response.json())
+        // טעינת התראות
+        fetch(alertsWebhook)
+            .then(res => res.json())
             .then(data => {
                 alertSelect.innerHTML = '<option value="">-- נא לבחור התראה --</option>';
                 data.forEach(item => {
-                    const option = document.createElement("option");
-                    option.value = item.Name;
-                    option.textContent = item.Name;
-                    alertSelect.appendChild(option);
+                    const opt = document.createElement("option");
+                    opt.value = item.Name;
+                    opt.textContent = item.Name;
+                    alertSelect.appendChild(opt);
                 });
             })
-            .catch(error => {
-                console.error("Error:", error);
-                alertSelect.innerHTML = '<option value="">שגיאה בטעינת התראות</option>';
-            });
+            .catch(err => { alertSelect.innerHTML = '<option value="">שגיאה בטעינת התראות</option>'; });
+
+        // טעינת משתמשים
+        fetch(usersWebhook)
+            .then(res => res.json())
+            .then(data => {
+                userSelect.innerHTML = '<option value="">-- נא לבחור משתמש --</option>';
+                data.forEach(user => {
+                    const opt = document.createElement("option");
+                    opt.value = user.E_Mail; 
+                    opt.textContent = `${user.u_name} (${user.E_Mail})`;
+                    userSelect.appendChild(opt);
+                });
+            })
+            .catch(err => { userSelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>'; });
     });
 </script>
 </body>
