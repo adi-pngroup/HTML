@@ -26,20 +26,22 @@
         </div>
 
         <div class="form-group">
-            <label for="userSelect">בחר משתמש *</label>
-            <select id="userSelect" name="userEmail" required>
-                <option value="">-- טוען משתמשים... --</option>
-            </select>
-        </div>
-
-        <div class="form-group">
             <label for="actionSelect">בחר פעולה *</label>
             <select id="actionSelect" name="action" required>
+                <option value="">-- בחר פעולה --</option>
                 <option value="ADD">הוספת נמען להתראה</option>
                 <option value="REMOVE">הסרת נמען מהתראה</option>
                 <option value="DISABLE">ביטול פעילות התראה</option>
             </select>
         </div>
+
+        <div class="form-group" id="userGroup" style="display: none;">
+            <label for="userSelect">בחר משתמש *</label>
+            <select id="userSelect" name="userEmail">
+                <option value="">-- טוען משתמשים... --</option>
+            </select>
+        </div>
+        
         <button type="submit" id="submitBtn">בצע שינוי</button>
     </form>
 </div>
@@ -48,11 +50,22 @@
     const alertsWebhook = "https://hook.eu1.make.com/da6jn8y8eospwzeh329t3544mh7jagr1";
     const usersWebhook = "https://hook.eu1.make.com/s78by5k7katgk4r3m2a32xaycu8bfexl";
 
+    const actionSelect = document.getElementById("actionSelect");
+    const userGroup = document.getElementById("userGroup");
+
+    // לוגיקת הצגה/החבאה
+    actionSelect.addEventListener("change", function() {
+        if (this.value === "ADD" || this.value === "REMOVE") {
+            userGroup.style.display = "block";
+        } else {
+            userGroup.style.display = "none";
+        }
+    });
+
     window.addEventListener("DOMContentLoaded", function() {
         const alertSelect = document.getElementById("alertSelect");
         const userSelect = document.getElementById("userSelect");
 
-        // טעינת התראות
         fetch(alertsWebhook)
             .then(res => res.json())
             .then(data => {
@@ -63,22 +76,19 @@
                     opt.textContent = item.Name;
                     alertSelect.appendChild(opt);
                 });
-            })
-            .catch(err => { alertSelect.innerHTML = '<option value="">שגיאה בטעינת התראות</option>'; });
+            });
 
-        // טעינת משתמשים
         fetch(usersWebhook)
             .then(res => res.json())
             .then(data => {
                 userSelect.innerHTML = '<option value="">-- נא לבחור משתמש --</option>';
                 data.forEach(user => {
                     const opt = document.createElement("option");
-                    opt.value = user.E_Mail; 
+                    opt.value = user.E_Mail;
                     opt.textContent = `${user.u_name} (${user.E_Mail})`;
                     userSelect.appendChild(opt);
                 });
-            })
-            .catch(err => { userSelect.innerHTML = '<option value="">שגיאה בטעינת משתמשים</option>'; });
+            });
     });
 </script>
 </body>
