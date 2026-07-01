@@ -19,6 +19,13 @@
     <h2>ניהול מנויי התראות</h2>
     <form id="alertForm">
         <div class="form-group">
+            <label for="executorSelect">מבצע הפעולה *</label>
+            <select id="executorSelect" name="requesterEmail" required>
+                <option value="">-- טוען רשימה... --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
             <label for="alertSelect">בחר התראה *</label>
             <select id="alertSelect" name="alertName" required>
                 <option value="">-- טוען התראות... --</option>
@@ -36,7 +43,7 @@
         </div>
 
         <div class="form-group" id="userGroup" style="display: none;">
-            <label for="userSelect">בחר משתמש *</label>
+            <label for="userSelect">משתמש להוספה/הורדה *</label>
             <select id="userSelect" name="userEmail">
                 <option value="">-- טוען משתמשים... --</option>
             </select>
@@ -49,14 +56,12 @@
 <script>
     const alertsWebhook = "https://hook.eu1.make.com/da6jn8y8eospwzeh329t3544mh7jagr1";
     const usersWebhook = "https://hook.eu1.make.com/s78by5k7katgk4r3m2a32xaycu8bfexl";
+    const executorsWebhook = "https://hook.eu1.make.com/9at7qjjd084f9wswq5igpic1ql3sg2o5";
     const actionWebhook = "https://hook.eu1.make.com/82p4t2c1bie1gu4ln1km7paf4sfoufd3";
 
-    const actionSelect = document.getElementById("actionSelect");
-    const userGroup = document.getElementById("userGroup");
-    const alertForm = document.getElementById("alertForm");
-
-    // לוגיקת הצגה/החבאה לשדה משתמש
-    actionSelect.addEventListener("change", function() {
+    // לוגיקה להצגת שדה המשתמש לפי סוג הפעולה
+    document.getElementById("actionSelect").addEventListener("change", function() {
+        const userGroup = document.getElementById("userGroup");
         if (this.value === "ADD" || this.value === "REMOVE") {
             userGroup.style.display = "block";
         } else {
@@ -64,52 +69,51 @@
         }
     });
 
-    // שליחת הטופס ל-Make
-    alertForm.addEventListener("submit", function(e) {
-        e.preventDefault();
-        const formData = new FormData(alertForm);
-        const data = Object.fromEntries(formData.entries());
+    // טעינת כל הנתונים בטעינת העמוד
+    window.addEventListener("DOMContentLoaded", function() {
+        // 1. טעינת מבצעי פעולה
+        fetch(executorsWebhook).then(res => res.json()).then(data => {
+            const el = document.getElementById("executorSelect");
+            el.innerHTML = '<option value="">-- בחר מבצע פעולה --</option>';
+            data.forEach(u => {
+                const opt = document.createElement("option");
+                opt.value = u.E_Mail;
+                opt.textContent = u.u_name;
+                el.appendChild(opt);
+            });
+        });
 
-        fetch(actionWebhook, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-        .then(res => {
-            if(res.ok) alert("הפעולה בוצעה בהצלחה!");
-            else alert("שגיאה בביצוע הפעולה");
-        })
-        .catch(err => alert("שגיאת תקשורת"));
+        // 2. טעינת התראות
+        fetch(alertsWebhook).then(res => res.json()).then(data => {
+            const el = document.getElementById("alertSelect");
+            el.innerHTML = '<option value="">-- בחר התראה --</option>';
+            data.forEach(i => {
+                const opt = document.createElement("option");
+                opt.value = i.Name;
+                opt.textContent = i.Name;
+                el.appendChild(opt);
+            });
+        });
+
+        // 3. טעינת רשימת המשתמשים לשינוי
+        fetch(usersWebhook).then(res => res.json()).then(data => {
+            const el = document.getElementById("userSelect");
+            el.innerHTML = '<option value="">-- בחר משתמש --</option>';
+            data.forEach(u => {
+                const opt = document.createElement("option");
+                opt.value = u.E_Mail;
+                opt.textContent = u.u_name;
+                el.appendChild(opt);
+            });
+        });
     });
 
-    // טעינת רשימות בטעינת העמוד
-    window.addEventListener("DOMContentLoaded", function() {
-        const alertSelect = document.getElementById("alertSelect");
-        const userSelect = document.getElementById("userSelect");
-
-        fetch(alertsWebhook)
-            .then(res => res.json())
-            .then(data => {
-                alertSelect.innerHTML = '<option value="">-- נא לבחור התראה --</option>';
-                data.forEach(item => {
-                    const opt = document.createElement("option");
-                    opt.value = item.Name;
-                    opt.textContent = item.Name;
-                    alertSelect.appendChild(opt);
-                });
-            });
-
-        fetch(usersWebhook)
-            .then(res => res.json())
-            .then(data => {
-                userSelect.innerHTML = '<option value="">-- נא לבחור משתמש --</option>';
-                data.forEach(user => {
-                    const opt = document.createElement("option");
-                    opt.value = user.E_Mail;
-                    opt.textContent = `${user.u_name} (${user.E_Mail})`;
-                    userSelect.appendChild(opt);
-                });
-            });
+    // שליחת הטופס
+    document.getElementById("alertForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(this).entries());
+        fetch(actionWebhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) })
+        .then(res => alert(res.ok ? "הפעולה בוצעה!" : "שגיאה בביצוע"));
     });
 </script>
 </body>
