@@ -49,11 +49,13 @@
 <script>
     const alertsWebhook = "https://hook.eu1.make.com/da6jn8y8eospwzeh329t3544mh7jagr1";
     const usersWebhook = "https://hook.eu1.make.com/s78by5k7katgk4r3m2a32xaycu8bfexl";
+    const actionWebhook = "https://hook.eu1.make.com/82p4t2c1bie1gu4ln1km7paf4sfoufd3";
 
     const actionSelect = document.getElementById("actionSelect");
     const userGroup = document.getElementById("userGroup");
+    const alertForm = document.getElementById("alertForm");
 
-    // לוגיקת הצגה/החבאה
+    // לוגיקת הצגה/החבאה לשדה משתמש
     actionSelect.addEventListener("change", function() {
         if (this.value === "ADD" || this.value === "REMOVE") {
             userGroup.style.display = "block";
@@ -62,6 +64,25 @@
         }
     });
 
+    // שליחת הטופס ל-Make
+    alertForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const formData = new FormData(alertForm);
+        const data = Object.fromEntries(formData.entries());
+
+        fetch(actionWebhook, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(res => {
+            if(res.ok) alert("הפעולה בוצעה בהצלחה!");
+            else alert("שגיאה בביצוע הפעולה");
+        })
+        .catch(err => alert("שגיאת תקשורת"));
+    });
+
+    // טעינת רשימות בטעינת העמוד
     window.addEventListener("DOMContentLoaded", function() {
         const alertSelect = document.getElementById("alertSelect");
         const userSelect = document.getElementById("userSelect");
