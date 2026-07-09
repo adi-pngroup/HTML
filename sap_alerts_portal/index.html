@@ -54,12 +54,13 @@
 </div>
 
 <script>
+    // הגדרת ה-Webhooks
     const alertsWebhook = "https://hook.eu1.make.com/da6jn8y8eospwzeh329t3544mh7jagr1";
     const usersWebhook = "https://hook.eu1.make.com/s78by5k7katgk4r3m2a32xaycu8bfexl";
     const executorsWebhook = "https://hook.eu1.make.com/9at7qjjd084f9wswq5igpic1ql3sg2o5";
     const actionWebhook = "https://hook.eu1.make.com/82p4t2c1bie1gu4ln1km7paf4sfoufd3";
 
-    // לוגיקה להצגת שדה המשתמש לפי סוג הפעולה
+    // לוגיקת הצגת שדה המשתמש לפי סוג הפעולה
     document.getElementById("actionSelect").addEventListener("change", function() {
         const userGroup = document.getElementById("userGroup");
         if (this.value === "ADD" || this.value === "REMOVE") {
@@ -78,7 +79,7 @@
             data.forEach(u => {
                 const opt = document.createElement("option");
                 opt.value = u.E_Mail;
-                opt.textContent = u.u_name;
+                opt.textContent = `${u.u_name} (${u.E_Mail})`;
                 el.appendChild(opt);
             });
         });
@@ -102,7 +103,7 @@
             data.forEach(u => {
                 const opt = document.createElement("option");
                 opt.value = u.E_Mail;
-                opt.textContent = u.u_name;
+                opt.textContent = `${u.u_name} (${u.E_Mail})`;
                 el.appendChild(opt);
             });
         });
@@ -112,8 +113,17 @@
     document.getElementById("alertForm").addEventListener("submit", function(e) {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(this).entries());
-        fetch(actionWebhook, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) })
-        .then(res => alert(res.ok ? "הפעולה בוצעה!" : "שגיאה בביצוע"));
+        
+        fetch(actionWebhook, { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify(data) 
+        })
+        .then(res => res.json())
+        .then(res => {
+            alert(res.message || "הפעולה בוצעה בהצלחה!");
+        })
+        .catch(err => alert("שגיאה בביצוע הפעולה"));
     });
 </script>
 </body>
