@@ -16,7 +16,7 @@
 <body>
 
 <div class="form-container">
-    <h2>ניהול מנויי התראות</h2>
+    <h2>ניהול התראות סאפ</h2>
     <form id="alertForm">
         <div class="form-group">
             <label for="executorSelect">מבצע הפעולה *</label>
@@ -54,13 +54,11 @@
 </div>
 
 <script>
-    // הגדרת ה-Webhooks
     const alertsWebhook = "https://hook.eu1.make.com/da6jn8y8eospwzeh329t3544mh7jagr1";
     const usersWebhook = "https://hook.eu1.make.com/s78by5k7katgk4r3m2a32xaycu8bfexl";
     const executorsWebhook = "https://hook.eu1.make.com/9at7qjjd084f9wswq5igpic1ql3sg2o5";
     const actionWebhook = "https://hook.eu1.make.com/82p4t2c1bie1gu4ln1km7paf4sfoufd3";
 
-    // לוגיקת הצגת שדה המשתמש לפי סוג הפעולה
     document.getElementById("actionSelect").addEventListener("change", function() {
         const userGroup = document.getElementById("userGroup");
         if (this.value === "ADD" || this.value === "REMOVE") {
@@ -70,21 +68,20 @@
         }
     });
 
-    // טעינת כל הנתונים בטעינת העמוד
     window.addEventListener("DOMContentLoaded", function() {
-        // 1. טעינת מבצעי פעולה (הצגת שם בלבד למשתמש, שליחת מייל ל-Make)
+        // 1. מבצע פעולה - שליחת שם (u_name)
         fetch(executorsWebhook).then(res => res.json()).then(data => {
             const el = document.getElementById("executorSelect");
             el.innerHTML = '<option value="">-- בחר מבצע פעולה --</option>';
             data.forEach(u => {
                 const opt = document.createElement("option");
-                opt.value = u.E_Mail;
-                opt.textContent = u.u_name; // מציג רק שם
+                opt.value = u.u_name; 
+                opt.textContent = u.u_name;
                 el.appendChild(opt);
             });
         });
 
-        // 2. טעינת התראות
+        // 2. התראות
         fetch(alertsWebhook).then(res => res.json()).then(data => {
             const el = document.getElementById("alertSelect");
             el.innerHTML = '<option value="">-- בחר התראה --</option>';
@@ -96,20 +93,19 @@
             });
         });
 
-        // 3. טעינת רשימת המשתמשים לשינוי (שם + מייל)
+        // 3. משתמשים להוספה/הורדה - שליחת מייל (E_Mail)
         fetch(usersWebhook).then(res => res.json()).then(data => {
             const el = document.getElementById("userSelect");
             el.innerHTML = '<option value="">-- בחר משתמש --</option>';
             data.forEach(u => {
                 const opt = document.createElement("option");
                 opt.value = u.E_Mail;
-                opt.textContent = `${u.u_name} (${u.E_Mail})`; // שם ומייל
+                opt.textContent = `${u.u_name} (${u.E_Mail})`;
                 el.appendChild(opt);
             });
         });
     });
 
-    // שליחת הטופס
     document.getElementById("alertForm").addEventListener("submit", function(e) {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(this).entries());
@@ -120,9 +116,7 @@
             body: JSON.stringify(data) 
         })
         .then(res => res.json())
-        .then(res => {
-            alert(res.message || "הפעולה בוצעה בהצלחה!");
-        })
+        .then(res => alert(res.message || "הפעולה בוצעה בהצלחה!"))
         .catch(err => alert("שגיאה בביצוע הפעולה"));
     });
 </script>
