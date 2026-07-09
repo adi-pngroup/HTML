@@ -72,14 +72,14 @@
 
     // טעינת כל הנתונים בטעינת העמוד
     window.addEventListener("DOMContentLoaded", function() {
-        // 1. טעינת מבצעי פעולה
+        // 1. טעינת מבצעי פעולה (הצגת שם בלבד למשתמש, שליחת מייל ל-Make)
         fetch(executorsWebhook).then(res => res.json()).then(data => {
             const el = document.getElementById("executorSelect");
             el.innerHTML = '<option value="">-- בחר מבצע פעולה --</option>';
             data.forEach(u => {
                 const opt = document.createElement("option");
                 opt.value = u.E_Mail;
-                opt.textContent = `${u.u_name} (${u.E_Mail})`;
+                opt.textContent = u.u_name; // מציג רק שם
                 el.appendChild(opt);
             });
         });
@@ -96,14 +96,14 @@
             });
         });
 
-        // 3. טעינת רשימת המשתמשים לשינוי
+        // 3. טעינת רשימת המשתמשים לשינוי (שם + מייל)
         fetch(usersWebhook).then(res => res.json()).then(data => {
             const el = document.getElementById("userSelect");
             el.innerHTML = '<option value="">-- בחר משתמש --</option>';
             data.forEach(u => {
                 const opt = document.createElement("option");
                 opt.value = u.E_Mail;
-                opt.textContent = `${u.u_name} (${u.E_Mail})`;
+                opt.textContent = `${u.u_name} (${u.E_Mail})`; // שם ומייל
                 el.appendChild(opt);
             });
         });
