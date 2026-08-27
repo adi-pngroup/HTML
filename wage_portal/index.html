@@ -165,11 +165,13 @@
 <body>
 
 <div class="form-container">
-    <h2>פורטל שכר - הגשת בקשה</h2>
+    <h2 id="portalHeader">פורטל שכר - הגשת בקשה</h2>
     
     <div id="alertBox" class="alert-message"></div>
     
     <form id="payrollForm" enctype="multipart/form-data">
+        <!-- שדה נסתר להעברת שם החברה ל-Make -->
+        <input type="hidden" id="company" name="company" value="">
         
         <div class="form-group">
             <label for="employeeName">שם העובד/ת *</label>
@@ -317,6 +319,23 @@
     const SPREADSHEET_ID = "1k3kyQX2usPvs5xe6q1203CUZS1rcRQcp2E_H8CMVu8M"; 
     const SHEET_GID = "1812873594"; 
     
+    // זיהוי החברה מה-URL
+    const urlParams = new URLSearchParams(window.location.search);
+    let targetCompany = urlParams.get('company') || '';
+    
+    if (targetCompany === 'pais' || targetCompany === 'פיס') {
+        targetCompany = 'פיס';
+    } else if (targetCompany === 'peernesher' || targetCompany === 'פאר נשר') {
+        targetCompany = 'פאר נשר';
+    }
+
+    // הגדרת הערך בשדה הנסתר וכותרת הדף
+    document.getElementById("company").value = targetCompany;
+    if (targetCompany) {
+        document.getElementById("portalHeader").innerText = `פורטל שכר - ${targetCompany}`;
+        document.title = `פורטל שכר - ${targetCompany}`;
+    }
+
     let existingEmployees = [];
 
     window.addEventListener("DOMContentLoaded", function() {
@@ -336,22 +355,27 @@
                 rows.forEach(row => {
                     if (row.c && row.c[0] && row.c[0].v) {
                         const name = row.c[0].v.toString().trim();
+                        const company = (row.c[2] && row.c[2].v) ? row.c[2].v.toString().trim() : '';
+
                         if (name && name !== "שם עובד" && name !== "שם העובד") {
-                            existingEmployees.push(name);
+                            // סינון לפי חברה אם הוגדרה ב-URL
+                            if (!targetCompany || company === targetCompany) {
+                                existingEmployees.push(name);
+                            }
                         }
                     }
                 });
 
-                // מיון השמות לעברית
+                // מיון שמות
                 existingEmployees.sort((a, b) => a.localeCompare(b, 'he'));
 
-                // הזרקת האופציה של עובד חדש בראש הרשימה (ראשון בתור!)
+                // עובד חדש
                 const newEmpOption = document.createElement("option");
                 newEmpOption.value = "__NEW_EMPLOYEE__";
                 newEmpOption.textContent = "⭐ עובד חדש / השם שלי לא מופיע";
                 employeeSelect.appendChild(newEmpOption);
 
-                // הזרקת שאר השמות הממוינים מא' עד ת'
+                // הזרקת עובדים ממוינים
                 existingEmployees.forEach(name => {
                     const option = document.createElement("option");
                     option.value = name;
