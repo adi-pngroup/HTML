@@ -160,11 +160,61 @@
             margin-top: 5px;
             display: none;
         }
+
+        /* עיצוב מסך בחירת חברה כאשר אין פרמטר */
+        .company-selection-screen {
+            text-align: center;
+            padding: 15px 10px;
+        }
+        .company-selection-screen p {
+            font-size: 15px;
+            margin-bottom: 25px;
+            color: #555;
+            line-height: 1.5;
+        }
+        .company-btn-grid {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .company-choice-btn {
+            flex: 1;
+            padding: 14px 10px;
+            font-size: 16px;
+            text-decoration: none;
+            color: white;
+            border-radius: 6px;
+            font-weight: bold;
+            display: block;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .company-choice-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.92;
+        }
+        .btn-peernesher {
+            background-color: #2980b9;
+        }
+        .btn-pais {
+            background-color: #8e44ad;
+        }
     </style>
 </head>
 <body>
 
 <div class="form-container">
+    <!-- מסך בחירת חברה כשאין חברה מוגדרת בקישור -->
+    <div id="noCompanyBlock" class="company-selection-screen" style="display: none;">
+        <h2 style="border: none; margin-bottom: 10px; padding-bottom: 0;">פורטל שכר - ריכוז בקשות</h2>
+        <p>לא נבחרה חברה. אנא בחר/י את החברה שלך כדי להמשיך להגשת הבקשה:</p>
+        <div class="company-btn-grid">
+            <a href="?company=peernesher" class="company-choice-btn btn-peernesher">🏢 פאר נשר</a>
+            <a href="?company=pais" class="company-choice-btn btn-pais">🏢 פיס</a>
+        </div>
+    </div>
+
+    <!-- כותרת הטופס הרגיל -->
     <h2 id="portalHeader">פורטל שכר - הגשת בקשה</h2>
     
     <div id="alertBox" class="alert-message"></div>
@@ -321,7 +371,7 @@
     
     // זיהוי החברה מה-URL
     const urlParams = new URLSearchParams(window.location.search);
-    let targetCompany = urlParams.get('company') || '';
+    let targetCompany = (urlParams.get('company') || '').trim();
     
     if (targetCompany === 'pais' || targetCompany === 'פיס') {
         targetCompany = 'פיס';
@@ -329,9 +379,15 @@
         targetCompany = 'פאר נשר';
     }
 
-    // הגדרת הערך בשדה הנסתר וכותרת הדף
-    document.getElementById("company").value = targetCompany;
-    if (targetCompany) {
+    // בדיקה האם הוגדרה חברה תקינה
+    if (!targetCompany) {
+        // אין חברה: מסתירים את הטופס ומציגים את מסך הבחירה
+        document.getElementById("payrollForm").style.display = "none";
+        document.getElementById("portalHeader").style.display = "none";
+        document.getElementById("noCompanyBlock").style.display = "block";
+    } else {
+        // יש חברה: מגדירים את הערך הנסתר ואת הכותרת
+        document.getElementById("company").value = targetCompany;
         document.getElementById("portalHeader").innerText = `פורטל שכר - ${targetCompany}`;
         document.title = `פורטל שכר - ${targetCompany}`;
     }
@@ -339,6 +395,9 @@
     let existingEmployees = [];
 
     window.addEventListener("DOMContentLoaded", function() {
+        // אם אין חברה, אין צורך להטעין את רשימת העובדים
+        if (!targetCompany) return;
+
         const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
         const employeeSelect = document.getElementById("employeeName");
 
@@ -358,24 +417,24 @@
                         const company = (row.c[2] && row.c[2].v) ? row.c[2].v.toString().trim() : '';
 
                         if (name && name !== "שם עובד" && name !== "שם העובד") {
-                            // סינון לפי חברה אם הוגדרה ב-URL
-                            if (!targetCompany || company === targetCompany) {
+                            // סינון לפי החברה הנבחרת
+                            if (company === targetCompany) {
                                 existingEmployees.push(name);
                             }
                         }
                     }
                 });
 
-                // מיון שמות
+                // מיון שמות לעברית
                 existingEmployees.sort((a, b) => a.localeCompare(b, 'he'));
 
-                // עובד חדש
+                // אופציית עובד חדש
                 const newEmpOption = document.createElement("option");
                 newEmpOption.value = "__NEW_EMPLOYEE__";
                 newEmpOption.textContent = "⭐ עובד חדש / השם שלי לא מופיע";
                 employeeSelect.appendChild(newEmpOption);
 
-                // הזרקת עובדים ממוינים
+                // הזרקת שאר השמות
                 existingEmployees.forEach(name => {
                     const option = document.createElement("option");
                     option.value = name;
