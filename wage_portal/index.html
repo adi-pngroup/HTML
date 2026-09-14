@@ -50,7 +50,7 @@
         }
 
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
 
         label {
@@ -70,7 +70,6 @@
             border-radius: 6px;
             box-sizing: border-box;
             font-size: 14px;
-            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         input:focus, select:focus, textarea:focus {
@@ -81,49 +80,44 @@
 
         textarea {
             resize: vertical;
-            min-height: 90px;
+            min-height: 85px;
         }
 
-        /* לשוניות ניווט ברורות */
-        .portal-tabs {
+        .history-top-bar {
             display: flex;
-            gap: 12px;
-            margin: 20px 0;
-            border-bottom: 2px solid #edf2f7;
-            padding-bottom: 10px;
-        }
-
-        .portal-tab-btn {
-            flex: 1;
-            padding: 12px;
-            font-size: 15px;
-            font-weight: bold;
-            border: 1px solid #dcdfe6;
-            border-radius: 8px;
-            background-color: #f8fafc;
-            color: #4a5568;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 6px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 18px 0 15px 0;
         }
 
-        .portal-tab-btn:hover {
-            background-color: #edf2f7;
+        .history-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
         }
 
-        .portal-tab-btn.active {
+        .btn-open-modal {
             background-color: var(--primary-color);
             color: white;
-            border-color: var(--primary-color);
-            box-shadow: 0 3px 8px rgba(74, 144, 226, 0.25);
+            border: none;
+            padding: 9px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
         }
 
-        /* אזור פניות קודמות */
+        .btn-open-modal:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
         .history-section {
-            margin: 10px 0 20px 0;
             display: none;
         }
 
@@ -131,14 +125,9 @@
             border: 1px solid #e1e8ed;
             border-radius: 8px;
             padding: 16px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             background-color: #ffffff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-            transition: box-shadow 0.2s;
-        }
-
-        .inquiry-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
         }
 
         .inquiry-top {
@@ -150,7 +139,7 @@
 
         .inquiry-subject {
             font-weight: bold;
-            font-size: 16px;
+            font-size: 15px;
             color: #2c3e50;
         }
 
@@ -169,25 +158,24 @@
         .inquiry-date {
             font-size: 12px;
             color: #7f8c8d;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
-        /* שרשור הודעות בתוך כרטיסיית הפנייה */
         .chat-thread {
             background-color: #f8fafc;
             border-radius: 8px;
-            padding: 12px;
-            margin: 10px 0 14px 0;
-            max-height: 240px;
+            padding: 10px;
+            margin: 10px 0;
+            max-height: 200px;
             overflow-y: auto;
             border: 1px solid #edf2f7;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .chat-bubble {
-            padding: 9px 13px;
+            padding: 8px 12px;
             border-radius: 8px;
             font-size: 13px;
             max-width: 85%;
@@ -197,20 +185,18 @@
         .bubble-employee {
             background-color: #e3f2fd;
             align-self: flex-start;
-            border-bottom-right-radius: 2px;
         }
 
         .bubble-admin {
             background-color: #e8f5e9;
             align-self: flex-end;
-            border-bottom-left-radius: 2px;
             border: 1px solid #c8e6c9;
         }
 
         .chat-meta {
             font-size: 11px;
-            color: #7f8c8d;
-            margin-bottom: 4px;
+            color: #888;
+            margin-bottom: 3px;
             font-weight: 600;
         }
 
@@ -222,14 +208,14 @@
 
         .reply-input {
             flex: 1;
-            padding: 9px 12px;
+            padding: 8px 10px;
             font-size: 13px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
         }
 
         .btn-reply {
-            padding: 9px 18px;
+            padding: 8px 16px;
             background-color: var(--primary-color);
             color: white;
             border: none;
@@ -238,41 +224,82 @@
             font-size: 13px;
             cursor: pointer;
             white-space: nowrap;
-            transition: background-color 0.2s;
         }
 
-        .btn-reply:hover {
-            background-color: var(--primary-dark);
-        }
-
-        /* עיצוב טופס פנייה חדשה */
-        #payrollForm {
-            border: 2px solid #4a90e2;
-            padding: 22px;
-            border-radius: 10px;
-            background-color: #ffffff;
-            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.08);
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.55);
             display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 580px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+
+        .btn-close-modal {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #7f8c8d;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .btn-close-modal:hover {
+            color: var(--error-color);
         }
 
         .fieldset-container {
             border: 1px solid #e2e8f0;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 18px;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 14px;
             background-color: #fafbfc;
         }
 
         .fieldset-title {
             font-weight: bold;
             color: var(--primary-color);
-            margin-bottom: 10px;
-            font-size: 14px;
+            margin-bottom: 8px;
+            font-size: 13px;
         }
 
         .row {
             display: flex;
-            gap: 12px;
+            gap: 10px;
         }
 
         .col {
@@ -291,10 +318,9 @@
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s;
         }
 
         .btn-submit:hover {
@@ -321,40 +347,12 @@
             display: none;
         }
 
-        .alert-success {
-            background-color: #e8f8f5;
-            color: var(--success-color);
-            border: 1px solid var(--success-color);
-        }
+        .alert-success { background-color: #e8f8f5; color: var(--success-color); border: 1px solid var(--success-color); }
+        .alert-error { background-color: #fceae8; color: var(--error-color); border: 1px solid var(--error-color); }
 
-        .alert-error {
-            background-color: #fceae8;
-            color: var(--error-color);
-            border: 1px solid var(--error-color);
-        }
-
-        /* מסך בחירת חברה כשאין פרמטר ב-URL */
-        .company-selection-screen {
-            text-align: center;
-            padding: 15px 10px;
-        }
-        .company-btn-grid {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .company-choice-btn {
-            flex: 1;
-            padding: 14px 10px;
-            font-size: 16px;
-            text-decoration: none;
-            color: white;
-            border-radius: 8px;
-            font-weight: bold;
-            display: block;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-        }
+        .company-selection-screen { text-align: center; padding: 15px 10px; }
+        .company-btn-grid { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+        .company-choice-btn { flex: 1; padding: 14px 10px; font-size: 16px; text-decoration: none; color: white; border-radius: 8px; font-weight: bold; display: block; }
         .btn-peernesher { background-color: #2980b9; }
         .btn-pais { background-color: #8e44ad; }
     </style>
@@ -362,7 +360,7 @@
 <body>
 
 <div class="portal-wrapper">
-    <!-- מסך בחירת חברה כשאין פרמטר בקישור -->
+    <!-- מסך בחירת חברה כשאין פרמטר ב-URL -->
     <div id="noCompanyBlock" class="company-selection-screen" style="display: none;">
         <h2>פורטל שכר - ריכוז בקשות</h2>
         <p>לא נבחרה חברה. אנא בחר/י את החברה שלך כדי להמשיך:</p>
@@ -391,38 +389,39 @@
             <p style="margin: 0 0 10px 0; font-size: 13px; color: #666;">השם שלך לא מופיע ברשימה? מלא את פרטייך והמערכת תעדכן אותך אוטומטית להבא.</p>
             <div class="form-group">
                 <label for="newEmployeeName">שם מלא בעברית *</label>
-                <input type="text" id="newEmployeeName" placeholder="לדוגמה: ישראל ישראלי" oninput="validateUniqueName(this.value)">
+                <input type="text" id="newEmployeeName" name="newEmployeeName" placeholder="לדוגמה: ישראל ישראלי" oninput="validateUniqueName(this.value)">
                 <div id="nameErrorBox" style="color:red; font-size:13px; font-weight:bold; margin-top:5px; display:none;">⚠️ עובד בשם זה כבר קיים ברשימה! נא לבחור את שמך מהרשימה למעלה.</div>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
                 <label for="newEmployeeEmail">כתובת מייל לקבלת עדכונים *</label>
-                <input type="email" id="newEmployeeEmail" placeholder="user@domain.co.il">
+                <input type="email" id="newEmployeeEmail" name="newEmployeeEmail" placeholder="user@domain.co.il">
             </div>
         </div>
 
-        <!-- לשוניות ניווט בין היסטוריה לפנייה חדשה -->
-        <div id="tabsContainer" class="portal-tabs" style="display: none;">
-            <button type="button" class="portal-tab-btn active" id="tabHistoryBtn" onclick="switchView('history')">
-                💬 פניות קודמות
-            </button>
-            <button type="button" class="portal-tab-btn" id="tabNewBtn" onclick="switchView('new')">
-                ➕ פתיחת פנייה חדשה
-            </button>
-        </div>
-
-        <!-- אזור 3 פניות אחרונות והתכתבויות -->
+        <!-- אזור פניות קודמות -->
         <div id="historySection" class="history-section">
+            <div class="history-top-bar">
+                <span class="history-title">📑 3 פניות אחרונות שלך</span>
+                <button type="button" class="btn-open-modal" onclick="openNewInquiryModal()">➕ פתיחת פנייה חדשה</button>
+            </div>
             <div id="inquiriesContainer">
-                <div style="text-align: center; color: #7f8c8d; font-size: 13px; padding: 15px;">טוען פניות... ⏳</div>
+                <div style="text-align: center; color: #7f8c8d; font-size: 13px; padding: 20px;">טוען היסטוריית פניות... ⏳</div>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- טופס פתיחת פנייה חדשה -->
+<!-- חלון קופץ מודאלי (Modal) לפנייה חדשה -->
+<div id="newInquiryModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>📝 פתיחת פנייה חדשה לשכר</h3>
+            <button type="button" class="btn-close-modal" onclick="closeNewInquiryModal()">✖</button>
+        </div>
+
         <form id="payrollForm" enctype="multipart/form-data">
             <input type="hidden" id="company" name="company" value="">
             <input type="hidden" id="selectedEmployeeHidden" name="employeeName" value="">
-            
-            <div class="fieldset-title" style="font-size: 16px; margin-bottom: 16px;">📝 פתיחת פנייה חדשה</div>
 
             <div class="form-group">
                 <label for="requestSubject">נושא הבקשה *</label>
@@ -552,7 +551,7 @@
     const MESSAGES_SHEET_NAME = "הודעות פנייה";
     const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/2d79o32chny5995mdvvc3ok2pa9ov236";
 
-    // זיהוי החברה מה-URL
+    // זיהוי חברה מה-URL
     const urlParams = new URLSearchParams(window.location.search);
     let targetCompany = (urlParams.get('company') || '').trim();
 
@@ -622,31 +621,9 @@
             });
     });
 
-    // מעבר בין תצוגת היסטוריה לפנייה חדשה (Tabs)
-    function switchView(viewName) {
-        const historySection = document.getElementById("historySection");
-        const payrollForm = document.getElementById("payrollForm");
-        const tabHistoryBtn = document.getElementById("tabHistoryBtn");
-        const tabNewBtn = document.getElementById("tabNewBtn");
-
-        if (viewName === 'new') {
-            historySection.style.display = "none";
-            payrollForm.style.display = "block";
-            tabNewBtn.classList.add("active");
-            tabHistoryBtn.classList.remove("active");
-        } else {
-            historySection.style.display = "block";
-            payrollForm.style.display = "none";
-            tabHistoryBtn.classList.add("active");
-            tabNewBtn.classList.remove("active");
-        }
-    }
-
-    // בחירת עובד מה-Dropdown
+    // בחירת עובד
     function onEmployeeSelected(name) {
-        const tabsContainer = document.getElementById("tabsContainer");
         const historySection = document.getElementById("historySection");
-        const payrollForm = document.getElementById("payrollForm");
         const newEmpSection = document.getElementById("newEmployeeSection");
         const selectedEmployeeHidden = document.getElementById("selectedEmployeeHidden");
         const newNameInput = document.getElementById("newEmployeeName");
@@ -656,11 +633,10 @@
 
         if (name === "__NEW_EMPLOYEE__") {
             newEmpSection.style.display = "block";
-            tabsContainer.style.display = "none";
             historySection.style.display = "none";
-            payrollForm.style.display = "block";
             newNameInput.required = true;
             newEmailInput.required = true;
+            openNewInquiryModal();
             return;
         }
 
@@ -669,23 +645,34 @@
         newEmailInput.required = false;
 
         if (!name) {
-            tabsContainer.style.display = "none";
             historySection.style.display = "none";
-            payrollForm.style.display = "none";
             return;
         }
 
-        // עובד קיים נבחר: מציגים את הלשוניות ומפעילים את היסטוריית הפניות
-        tabsContainer.style.display = "flex";
-        switchView('history');
+        historySection.style.display = "block";
         loadEmployeeInquiries(name);
     }
 
-    // טעינת פניות והודעות של העובד
-    function loadEmployeeInquiries(employeeName) {
-        const historySection = document.getElementById("historySection");
-        const container = document.getElementById("inquiriesContainer");
+    function openNewInquiryModal() {
+        const modal = document.getElementById("newInquiryModal");
+        modal.style.display = "flex";
+    }
 
+    function closeNewInquiryModal() {
+        const modal = document.getElementById("newInquiryModal");
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById("newInquiryModal");
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
+
+    // טעינת פניות והודעות
+    function loadEmployeeInquiries(employeeName) {
+        const container = document.getElementById("inquiriesContainer");
         container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 13px; padding: 20px;">טוען היסטוריית פניות... ⏳</div>';
 
         const inquiriesUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(INQUIRIES_SHEET_NAME)}`;
@@ -699,7 +686,6 @@
             const inqJson = JSON.parse(inquiriesTxt.substring(inquiriesTxt.indexOf('{'), inquiriesTxt.lastIndexOf('}') + 1));
             const msgJson = JSON.parse(messagesTxt.substring(messagesTxt.indexOf('{'), messagesTxt.lastIndexOf('}') + 1));
 
-            // בניית מילון הודעות לפי מזהה פנייה
             const messagesByInquiry = {};
             msgJson.table.rows.forEach(row => {
                 if (row.c && row.c[1] && row.c[1].v) {
@@ -713,7 +699,6 @@
                 }
             });
 
-            // סינון פניות לפי שם העובד
             const matchingInquiries = [];
             inqJson.table.rows.forEach((row, idx) => {
                 if (!row.c) return;
@@ -743,24 +728,20 @@
                 }
             });
 
-            // שמירת 3 הפניות האחרונות
             currentInquiries = matchingInquiries.slice(-3).reverse();
 
             if (currentInquiries.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 14px; padding: 25px;">לא נמצאו פניות קודמות. מוזמן לפתוח פנייה חדשה בלשונית למעלה!</div>';
-                switchView('new');
+                container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 14px; padding: 25px;">אין פניות קודמות. לחץ על הכפתור למעלה לפתיחת פנייה ראשונה!</div>';
             } else {
                 renderInquiries(currentInquiries);
             }
         })
         .catch(err => {
-            console.error("Error fetching data:", err);
-            container.innerHTML = '<div style="text-align:center; color:#e74c3c; font-size:13px; padding: 15px;">לא הצלחנו לטעון את הפניות הקודמות. ניתן לפתוח פנייה חדשה.</div>';
-            switchView('new');
+            console.error("Error fetching inquiries:", err);
+            container.innerHTML = '<div style="text-align:center; color:#e74c3c; font-size:13px; padding: 15px;">שגיאה בטעינת פניות קודמות.</div>';
         });
     }
 
-    // הצגת הפניות במסך
     function renderInquiries(inquiries) {
         const container = document.getElementById("inquiriesContainer");
         container.innerHTML = "";
@@ -896,12 +877,21 @@
             .replace(/'/g, '&#039;');
     }
 
-    // הגשת טופס פתיחת פנייה חדשה
+    // שליחת טופס פנייה חדשה מתוך המודאל
     document.getElementById("payrollForm").addEventListener("submit", function(e) {
         e.preventDefault();
         const form = e.target;
         const submitBtn = document.getElementById("submitBtn");
         const formData = new FormData(form);
+
+        // הוספת פרטי עובד חדש במידה ונבחרה אופציית רישום עובד חדש
+        const employeeSelectVal = document.getElementById("employeeName").value;
+        if (employeeSelectVal === "__NEW_EMPLOYEE__") {
+            const newName = document.getElementById("newEmployeeName").value.trim();
+            const newEmail = document.getElementById("newEmployeeEmail").value.trim();
+            formData.append("newEmployeeName", newName);
+            formData.append("newEmployeeEmail", newEmail);
+        }
 
         submitBtn.disabled = true;
         submitBtn.innerText = "שולח בקשה...";
@@ -912,12 +902,12 @@
         })
         .then(res => {
             if (!res.ok) throw new Error("Server error");
+            closeNewInquiryModal();
             showAlert("הבקשה נשלחה בהצלחה! היא נוספה לרשימת הפניות שלך.", "success");
             form.reset();
             toggleSections();
             const empName = document.getElementById("employeeName").value;
             if (empName && empName !== "__NEW_EMPLOYEE__") {
-                switchView('history');
                 setTimeout(() => loadEmployeeInquiries(empName), 1500);
             }
         })
