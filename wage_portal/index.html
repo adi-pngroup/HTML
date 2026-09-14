@@ -51,6 +51,7 @@
 
         .form-group {
             margin-bottom: 18px;
+            position: relative;
         }
 
         label {
@@ -78,6 +79,36 @@
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+        }
+
+        /* שדה סיסמה עם כפתור עין */
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input {
+            padding-left: 40px; /* רווח לכפתור העין בצד שמאל */
+        }
+
+        .toggle-password-btn {
+            position: absolute;
+            left: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #7f8c8d;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .toggle-password-btn:hover {
+            color: var(--primary-color);
         }
 
         textarea {
@@ -395,7 +426,10 @@
                 </div>
                 <div class="form-group">
                     <label for="loginPassword">סיסמה (מספר תעודת זהות) *</label>
-                    <input type="password" id="loginPassword" required placeholder="הזן מספר תעודת זהות (9 ספרות)">
+                    <div class="password-wrapper">
+                        <input type="password" id="loginPassword" required placeholder="הזן תעודת זהות">
+                        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('loginPassword', this)" title="הצג/הסתר סיסמה">👁️</button>
+                    </div>
                 </div>
                 <button type="submit" class="btn-submit" id="loginBtn">התחברות למערכת ⬅️</button>
             </form>
@@ -427,7 +461,10 @@
 
                 <div class="form-group">
                     <label for="regId">מספר תעודת זהות (ישמש כסיסמה) *</label>
-                    <input type="text" id="regId" required maxlength="9" placeholder="9 ספרות (ללא מקף)">
+                    <div class="password-wrapper">
+                        <input type="password" id="regId" required maxlength="9" placeholder="עד 9 ספרות (ללא מקף)">
+                        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('regId', this)" title="הצג/הסתר סיסמה">👁️</button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -603,7 +640,7 @@
     const MESSAGES_SHEET_NAME = "הודעות פנייה";
     const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/2d79o32chny5995mdvvc3ok2pa9ov236";
 
-    // זיהוי החברה מה-URL
+    // זיהוי חברה מה-URL
     const urlParams = new URLSearchParams(window.location.search);
     let targetCompany = (urlParams.get('company') || '').trim();
 
@@ -627,6 +664,28 @@
     let employeesData = []; 
     let loggedInUser = null; 
 
+    // פונקציה מנרמלת ת"ז: מנקה תווים ומשלימה אפס מוביל ל-9 ספרות
+    function normalizeId(val) {
+        if (!val) return '';
+        const digits = val.toString().replace(/\D/g, '').trim();
+        if (digits.length > 0 && digits.length <= 9) {
+            return digits.padStart(9, '0');
+        }
+        return digits;
+    }
+
+    // הצגת / הסתרת סיסמה (כפתור עין)
+    function togglePasswordVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            btn.innerText = "🙈";
+        } else {
+            input.type = "password";
+            btn.innerText = "👁️";
+        }
+    }
+
     // טעינת רשימת משתמשים לאימות (מייל + ת"ז)
     window.addEventListener("DOMContentLoaded", function() {
         if (!targetCompany) return;
@@ -646,7 +705,10 @@
                         const name = row.c[0].v.toString().trim();
                         const email = (row.c[1] && row.c[1].v) ? row.c[1].v.toString().trim().toLowerCase() : '';
                         const company = (row.c[2] && row.c[2].v) ? row.c[2].v.toString().trim() : '';
-                        const password = (row.c[3] && row.c[3].v) ? row.c[3].v.toString().trim() : '';
+                        
+                        // קריאת הסיסמה (ת"ז) - בדיקה גם ב-f (מעוצב) וגם ב-v (ערך גולמי), ונרמול ל-9 ספרות
+                        const rawPass = (row.c[3] && row.c[3].f) ? row.c[3].f : ((row.c[3] && row.c[3].v !== undefined) ? row.c[3].v.toString() : '');
+                        const password = normalizeId(rawPass);
 
                         if (name && !name.includes("שם עובד")) {
                             employeesData.push({ name, email, company, password });
@@ -663,11 +725,11 @@
         document.getElementById("alertBox").style.display = "none";
     }
 
-    // אימות משתמש קיים
+    // אימות והתחברות (Login)
     function handleLogin(e) {
         e.preventDefault();
         const emailInput = document.getElementById("loginEmail").value.trim().toLowerCase();
-        const passInput = document.getElementById("loginPassword").value.trim();
+        const passInput = normalizeId(document.getElementById("loginPassword").value.trim());
 
         const match = employeesData.find(u => 
             u.email === emailInput && 
@@ -695,11 +757,11 @@
         e.preventDefault();
         const regName = document.getElementById("regName").value.trim();
         const regEmail = document.getElementById("regEmail").value.trim().toLowerCase();
-        const regId = document.getElementById("regId").value.trim();
+        const regId = normalizeId(document.getElementById("regId").value.trim());
         const regCompany = document.getElementById("regCompany").value;
 
-        if (!/^\d{8,9}$/.test(regId)) {
-            alert("נא להזין מספר תעודת זהות תקין (8 או 9 ספרות).");
+        if (!regId || regId.length < 8) {
+            alert("נא להזין מספר תעודת זהות תקין.");
             return;
         }
 
@@ -759,10 +821,9 @@
         }
     }
 
-    // פונקציית פענוח תאריכים מדויקת למיון כרונולוגי
+    // פענוח תאריכים לצורך מיון כרונולוגי
     function parseDateToTimestamp(dateStr) {
         if (!dateStr) return 0;
-        // זיהוי פורמט ישראלי: DD/MM/YYYY HH:mm:ss
         const parts = dateStr.toString().match(/(\d{1,2})[\/\.-](\d{1,2})[\/\.-](\d{4})[ ,T]+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);
         if (parts) {
             return new Date(parts[3], parts[2] - 1, parts[1], parts[4], parts[5], parts[6] || 0).getTime();
@@ -787,7 +848,7 @@
             const inqJson = JSON.parse(inquiriesTxt.substring(inquiriesTxt.indexOf('{'), inquiriesTxt.lastIndexOf('}') + 1));
             const msgJson = JSON.parse(messagesTxt.substring(messagesTxt.indexOf('{'), messagesTxt.lastIndexOf('}') + 1));
 
-            // בניית מילון הודעות לפי מזהה פנייה
+            // בניית מילון הודעות
             const messagesByInquiry = {};
             msgJson.table.rows.forEach(row => {
                 if (row.c && row.c[1] && row.c[1].v) {
@@ -801,7 +862,7 @@
                 }
             });
 
-            // סינון פניות לפי שם העובד המחובר
+            // סינון פניות לפי שם העובד
             const matchingInquiries = [];
             inqJson.table.rows.forEach((row, idx) => {
                 if (!row.c) return;
@@ -831,7 +892,7 @@
                 }
             });
 
-            // מיון כרונולוגי של הודעות השיחה מהישנה לחדשה ביותר
+            // מיון כרונולוגי של הודעות השיחה מהמוקדמת למאוחרת
             matchingInquiries.forEach(inq => {
                 inq.messages.sort((a, b) => {
                     return parseDateToTimestamp(a.date) - parseDateToTimestamp(b.date);
@@ -842,7 +903,7 @@
             const currentInquiries = matchingInquiries.slice(-3).reverse();
 
             if (currentInquiries.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 14px; padding: 25px;">לא נמצאו פניות קודמות. מוזמן לפתוח פנייה חדשה בלשונית למעלה!</div>';
+                container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 14px; padding: 25px;">אין פניות קודמות. מוזמן לפתוח פנייה ראשונה בלשונית למעלה!</div>';
                 switchView('new');
             } else {
                 renderInquiries(currentInquiries);
@@ -854,7 +915,6 @@
         });
     }
 
-    // רינדור כרטיסיות הפניות
     function renderInquiries(inquiries) {
         const container = document.getElementById("inquiriesContainer");
         container.innerHTML = "";
@@ -907,7 +967,6 @@
         }
     }
 
-    // מענה לפנייה קיימת
     function sendReply(inquiryId) {
         const input = document.getElementById(`replyInput_${inquiryId}`);
         const btn = document.getElementById(`replyBtn_${inquiryId}`);
