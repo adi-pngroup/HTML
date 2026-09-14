@@ -371,7 +371,7 @@
 <body>
 
 <div class="portal-wrapper">
-    <!-- מסך בחירת חברה (במידה ואין פרמטר בקישור) -->
+    <!-- מסך בחירת חברה (אם אין פרמטר בקישור) -->
     <div id="noCompanyBlock" class="company-selection-screen" style="display: none;">
         <h2>פורטל שכר - ריכוז בקשות</h2>
         <p>לא נבחרה חברה. אנא בחר/י את החברה שלך כדי להמשיך:</p>
@@ -385,7 +385,7 @@
         <h2 id="portalHeader">פורטל שכר</h2>
         <div id="alertBox" class="alert-message"></div>
 
-        <!-- מסך 1: התחברות (Login) מאובטחת -->
+        <!-- מסך 1: התחברות (Login) -->
         <div id="loginBlock" class="fieldset-container">
             <div class="fieldset-title" style="font-size: 16px; margin-bottom: 15px;">🔐 כניסה לפורטל שכר</div>
             <form id="loginForm" onsubmit="handleLogin(event)">
@@ -405,7 +405,7 @@
             </div>
         </div>
 
-        <!-- מסך 2: הרשמת עובד חדש (מוסתר כברירת מחדל) -->
+        <!-- מסך 2: הרשמת עובד חדש -->
         <div id="registerBlock" class="fieldset-container" style="display: none; border-color: #f39c12; background-color: #fffaf0;">
             <div class="fieldset-title" style="color: #e67e22; font-size: 16px; margin-bottom: 12px;">⭐ רישום עובד חדש במערכת</div>
             <p style="margin: 0 0 12px 0; font-size: 13px; color: #666;">לאחר מילוי הפרטים, תוכל/י לפתוח פנייה ראשונה והפרטים יישמרו להבא.</p>
@@ -443,9 +443,8 @@
             </div>
         </div>
 
-        <!-- אזור הפורטל הראשי (נחשף רק לאחר התחברות / רישום) -->
+        <!-- אזור הפורטל הראשי (נחשף לאחר כניסה) -->
         <div id="portalDashboard" style="display: none;">
-            <!-- פס עליון עם שם העובד וכפתור התנתקות -->
             <div class="user-welcome-bar">
                 <span class="user-welcome-text">שלום, <b id="loggedInUserName"></b> 👋</span>
                 <button type="button" class="btn-logout" onclick="logout()">התנתק 🚪</button>
@@ -625,13 +624,13 @@
         if (regCompanySelect) regCompanySelect.value = targetCompany;
     }
 
-    let employeesData = []; // מאגר עובדים לצורך אימות (מייל + ת"ז)
-    let loggedInUser = null; // ישמור את פרטי המשתמש המחובר
+    let employeesData = []; 
+    let loggedInUser = null; 
 
+    // טעינת רשימת משתמשים לאימות (מייל + ת"ז)
     window.addEventListener("DOMContentLoaded", function() {
         if (!targetCompany) return;
 
-        // טעינת גיליון עובדים לצורך אימות בלבד (עמודות: A=שם, B=מייל, C=חברה, D=סיסמה/ת"ז)
         const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${EMPLOYEES_GID}`;
 
         fetch(url)
@@ -655,17 +654,16 @@
                     }
                 });
             })
-            .catch(err => console.error("Error pre-loading auth data:", err));
+            .catch(err => console.error("Error loading auth data:", err));
     });
 
-    // מעבר בין התחברות לרישום
     function toggleNewUserMode(isNew) {
         document.getElementById("loginBlock").style.display = isNew ? "none" : "block";
         document.getElementById("registerBlock").style.display = isNew ? "block" : "none";
         document.getElementById("alertBox").style.display = "none";
     }
 
-    // אימות והתחברות (Login)
+    // אימות משתמש קיים
     function handleLogin(e) {
         e.preventDefault();
         const emailInput = document.getElementById("loginEmail").value.trim().toLowerCase();
@@ -682,7 +680,6 @@
             return;
         }
 
-        // התחברות בהצלחה
         loggedInUser = {
             name: match.name,
             email: match.email,
@@ -717,7 +714,6 @@
         activateUserSession();
     }
 
-    // הפעלת ממשק המשתמש לאחר כניסה
     function activateUserSession() {
         document.getElementById("loginBlock").style.display = "none";
         document.getElementById("registerBlock").style.display = "none";
@@ -726,11 +722,9 @@
         document.getElementById("selectedEmployeeHidden").value = loggedInUser.isNew ? "__NEW_EMPLOYEE__" : loggedInUser.name;
 
         if (loggedInUser.isNew) {
-            // משתמש חדש מועבר ישירות ללשונית מילוי פנייה חדשה
             switchView('new');
-            document.getElementById("inquiriesContainer").innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 14px; padding: 25px;">ברוך הבא! אין פניות קודמות. מוזמן לפתוח פנייה חדשה בלשונית למעלה!</div>';
+            document.getElementById("inquiriesContainer").innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 14px; padding: 25px;">ברוך הבא! אין פניות קודמות. מוזמן לפתוח פנייה ראשונה בלשונית למעלה!</div>';
         } else {
-            // משתמש קיים טוען את 3 הפניות שלו
             switchView('history');
             loadEmployeeInquiries(loggedInUser.name);
         }
@@ -765,7 +759,19 @@
         }
     }
 
-    // טעינת פניות של העובד המחובר בלבד
+    // פונקציית פענוח תאריכים מדויקת למיון כרונולוגי
+    function parseDateToTimestamp(dateStr) {
+        if (!dateStr) return 0;
+        // זיהוי פורמט ישראלי: DD/MM/YYYY HH:mm:ss
+        const parts = dateStr.toString().match(/(\d{1,2})[\/\.-](\d{1,2})[\/\.-](\d{4})[ ,T]+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);
+        if (parts) {
+            return new Date(parts[3], parts[2] - 1, parts[1], parts[4], parts[5], parts[6] || 0).getTime();
+        }
+        const t = Date.parse(dateStr);
+        return isNaN(t) ? 0 : t;
+    }
+
+    // טעינת פניות והודעות של העובד
     function loadEmployeeInquiries(employeeName) {
         const container = document.getElementById("inquiriesContainer");
         container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 13px; padding: 20px;">טוען היסטוריית פניות... ⏳</div>';
@@ -781,6 +787,7 @@
             const inqJson = JSON.parse(inquiriesTxt.substring(inquiriesTxt.indexOf('{'), inquiriesTxt.lastIndexOf('}') + 1));
             const msgJson = JSON.parse(messagesTxt.substring(messagesTxt.indexOf('{'), messagesTxt.lastIndexOf('}') + 1));
 
+            // בניית מילון הודעות לפי מזהה פנייה
             const messagesByInquiry = {};
             msgJson.table.rows.forEach(row => {
                 if (row.c && row.c[1] && row.c[1].v) {
@@ -794,6 +801,7 @@
                 }
             });
 
+            // סינון פניות לפי שם העובד המחובר
             const matchingInquiries = [];
             inqJson.table.rows.forEach((row, idx) => {
                 if (!row.c) return;
@@ -823,10 +831,18 @@
                 }
             });
 
+            // מיון כרונולוגי של הודעות השיחה מהישנה לחדשה ביותר
+            matchingInquiries.forEach(inq => {
+                inq.messages.sort((a, b) => {
+                    return parseDateToTimestamp(a.date) - parseDateToTimestamp(b.date);
+                });
+            });
+
+            // שמירת 3 הפניות האחרונות
             const currentInquiries = matchingInquiries.slice(-3).reverse();
 
             if (currentInquiries.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 14px; padding: 25px;">אין פניות קודמות. מוזמן לפתוח פנייה ראשונה בלשונית למעלה!</div>';
+                container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 14px; padding: 25px;">לא נמצאו פניות קודמות. מוזמן לפתוח פנייה חדשה בלשונית למעלה!</div>';
                 switchView('new');
             } else {
                 renderInquiries(currentInquiries);
@@ -838,6 +854,7 @@
         });
     }
 
+    // רינדור כרטיסיות הפניות
     function renderInquiries(inquiries) {
         const container = document.getElementById("inquiriesContainer");
         container.innerHTML = "";
@@ -890,6 +907,7 @@
         }
     }
 
+    // מענה לפנייה קיימת
     function sendReply(inquiryId) {
         const input = document.getElementById(`replyInput_${inquiryId}`);
         const btn = document.getElementById(`replyBtn_${inquiryId}`);
