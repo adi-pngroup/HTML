@@ -7,50 +7,57 @@
     <style>
         :root {
             --primary-color: #4a90e2;
-            --secondary-color: #f5f7fa;
-            --text-color: #333;
-            --border-color: #ccc;
-            --success-color: #2ecc71;
+            --primary-dark: #357abd;
+            --secondary-color: #f4f6f9;
+            --text-color: #2c3e50;
+            --border-color: #dcdfe6;
+            --success-color: #27ae60;
+            --warning-color: #e67e22;
             --error-color: #e74c3c;
+            --card-bg: #ffffff;
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: var(--secondary-color);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            padding: 20px 15px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
+            box-sizing: border-box;
         }
 
-        .form-container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        .portal-wrapper {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
             width: 100%;
-            max-width: 600px;
+            max-width: 680px;
         }
 
         h2 {
             text-align: center;
-            color: #2c3e50;
-            margin-bottom: 25px;
+            color: #1a252f;
+            margin-top: 0;
+            margin-bottom: 20px;
             border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
+            padding-bottom: 12px;
+            font-size: 22px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         label {
             display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
         }
 
         input[type="text"],
@@ -58,41 +65,200 @@
         select,
         textarea {
             width: 100%;
-            padding: 10px;
+            padding: 10px 12px;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: 6px;
             box-sizing: border-box;
             font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
         }
 
         textarea {
             resize: vertical;
-            height: 100px;
+            min-height: 85px;
         }
 
-        .fieldset-container {
-            border: 1px solid #e0e0e0;
-            padding: 15px;
+        /* כרטיסיות פניות קודמות */
+        .history-section {
+            margin: 20px 0 25px 0;
+            display: none;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .history-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-toggle-new {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            border: 1px solid #bdc3c7;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-toggle-new:hover, .btn-toggle-new.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .inquiry-card {
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+            background-color: #ffffff;
+            transition: box-shadow 0.2s;
+        }
+
+        .inquiry-card:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .inquiry-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .inquiry-subject {
+            font-weight: bold;
+            font-size: 15px;
+            color: #2c3e50;
+        }
+
+        .inquiry-status {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: #eee;
+        }
+
+        .status-open { background-color: #fef5d1; color: #b7791f; }
+        .status-replied { background-color: #d1fae5; color: #065f46; }
+        .status-closed { background-color: #e2e8f0; color: #475569; }
+
+        .inquiry-date {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+
+        /* שרשור הודעות בתוך הפנייה */
+        .chat-thread {
+            background-color: #f8fafc;
             border-radius: 6px;
-            margin-bottom: 20px;
-            background-color: #fafafa;
+            padding: 10px;
+            margin: 10px 0;
+            max-height: 220px;
+            overflow-y: auto;
+            border: 1px solid #edf2f7;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        #newEmployeeSection {
-            display: none; 
-            border-color: #f39c12; 
-            background-color: #fafafa;
+        .chat-bubble {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            max-width: 85%;
+            line-height: 1.4;
+        }
+
+        .bubble-employee {
+            background-color: #e3f2fd;
+            align-self: flex-start;
+            border-bottom-right-radius: 2px;
+        }
+
+        .bubble-admin {
+            background-color: #e8f5e9;
+            align-self: flex-end;
+            border-bottom-left-radius: 2px;
+            border: 1px solid #c8e6c9;
+        }
+
+        .chat-meta {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 3px;
+            font-weight: bold;
+        }
+
+        .reply-box {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .reply-input {
+            flex: 1;
+            padding: 8px 10px;
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .btn-reply {
+            padding: 8px 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-reply:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* סגנון טופס פנייה חדשה */
+        .fieldset-container {
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            background-color: #fafbfc;
         }
 
         .fieldset-title {
             font-weight: bold;
             color: var(--primary-color);
             margin-bottom: 10px;
+            font-size: 14px;
         }
 
         .row {
             display: flex;
-            gap: 15px;
+            gap: 12px;
         }
 
         .col {
@@ -100,29 +266,29 @@
         }
 
         .file-inputs input {
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             display: block;
         }
 
-        button {
+        .btn-submit {
             width: 100%;
             padding: 12px;
             background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.2s;
         }
 
-        button:hover {
-            background-color: #357abd;
+        .btn-submit:hover {
+            background-color: var(--primary-dark);
         }
 
-        button:disabled {
-            background-color: #95a5a6;
+        .btn-submit:disabled, .btn-reply:disabled {
+            background-color: #bdc3c7;
             cursor: not-allowed;
         }
 
@@ -133,9 +299,9 @@
         }
 
         .alert-message {
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
             font-weight: bold;
             text-align: center;
             display: none;
@@ -153,29 +319,16 @@
             border: 1px solid var(--error-color);
         }
 
-        .validation-error {
-            color: var(--error-color);
-            font-size: 13px;
-            font-weight: bold;
-            margin-top: 5px;
-            display: none;
-        }
-
-        /* עיצוב מסך בחירת חברה כאשר אין פרמטר */
+        /* בחירת חברה */
         .company-selection-screen {
             text-align: center;
             padding: 15px 10px;
-        }
-        .company-selection-screen p {
-            font-size: 15px;
-            margin-bottom: 25px;
-            color: #555;
-            line-height: 1.5;
         }
         .company-btn-grid {
             display: flex;
             gap: 15px;
             justify-content: center;
+            margin-top: 20px;
         }
         .company-choice-btn {
             flex: 1;
@@ -183,241 +336,245 @@
             font-size: 16px;
             text-decoration: none;
             color: white;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: bold;
             display: block;
             box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-            transition: transform 0.2s, opacity 0.2s;
         }
-        .company-choice-btn:hover {
-            transform: translateY(-2px);
-            opacity: 0.92;
-        }
-        .btn-peernesher {
-            background-color: #2980b9;
-        }
-        .btn-pais {
-            background-color: #8e44ad;
-        }
+        .btn-peernesher { background-color: #2980b9; }
+        .btn-pais { background-color: #8e44ad; }
     </style>
 </head>
 <body>
 
-<div class="form-container">
-    <!-- מסך בחירת חברה כשאין חברה מוגדרת בקישור -->
+<div class="portal-wrapper">
+    <!-- מסך בחירת חברה כשאין פרמטר בקישור -->
     <div id="noCompanyBlock" class="company-selection-screen" style="display: none;">
-        <h2 style="border: none; margin-bottom: 10px; padding-bottom: 0;">פורטל שכר - ריכוז בקשות</h2>
-        <p>לא נבחרה חברה. אנא בחר/י את החברה שלך כדי להמשיך להגשת הבקשה:</p>
+        <h2>פורטל שכר - ריכוז בקשות</h2>
+        <p>לא נבחרה חברה. אנא בחר/י את החברה שלך כדי להמשיך:</p>
         <div class="company-btn-grid">
             <a href="?company=peernesher" class="company-choice-btn btn-peernesher">🏢 פאר נשר</a>
             <a href="?company=pais" class="company-choice-btn btn-pais">🏢 פיס</a>
         </div>
     </div>
 
-    <!-- כותרת הטופס הרגיל -->
-    <h2 id="portalHeader">פורטל שכר - הגשת בקשה</h2>
-    
-    <div id="alertBox" class="alert-message"></div>
-    
-    <form id="payrollForm" enctype="multipart/form-data">
-        <!-- שדה נסתר להעברת שם החברה ל-Make -->
-        <input type="hidden" id="company" name="company" value="">
+    <div id="portalMainContent">
+        <h2 id="portalHeader">פורטל שכר</h2>
         
+        <div id="alertBox" class="alert-message"></div>
+
+        <!-- בחירת עובד -->
         <div class="form-group">
             <label for="employeeName">שם העובד/ת *</label>
-            <select id="employeeName" name="employeeName" required onchange="checkNewEmployeeCSS(this.value)">
+            <select id="employeeName" name="employeeName" required onchange="onEmployeeSelected(this.value)">
                 <option value="">-- טוען רשימת עובדים... --</option>
             </select>
         </div>
 
-        <div id="newEmployeeSection" class="fieldset-container">
+        <!-- רישום עובד חדש -->
+        <div id="newEmployeeSection" class="fieldset-container" style="display: none;">
             <div class="fieldset-title" style="color: #e67e22;">רישום עובד חדש במערכת *</div>
-            <p style="margin: 0 0 12px 0; font-size: 13px; color: #666;">השם שלך לא נמצא ברשימה? מלא את פרטייך כאן והמערכת תעדכן אותך אוטומטית בפעם הבאה.</p>
+            <p style="margin: 0 0 10px 0; font-size: 13px; color: #666;">השם שלך לא ברשימה? מלא את פרטייך והמערכת תזהה אותך להבא.</p>
             <div class="form-group">
                 <label for="newEmployeeName">שם מלא בעברית *</label>
-                <input type="text" id="newEmployeeName" name="newEmployeeName" placeholder="לדוגמה: ישראל ישראלי" oninput="validateUniqueName(this.value)">
-                <div id="nameErrorBox" class="validation-error">⚠️ עובד עם שם זה כבר קיים ברשימה! נא לבחור את שמך מתוך הרשימה למעלה.</div>
+                <input type="text" id="newEmployeeName" placeholder="לדוגמה: ישראל ישראלי" oninput="validateUniqueName(this.value)">
+                <div id="nameErrorBox" style="color:red; font-size:13px; font-weight:bold; margin-top:5px; display:none;">⚠️ עובד בשם זה כבר קיים ברשימה!</div>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
                 <label for="newEmployeeEmail">כתובת מייל לקבלת עדכונים *</label>
-                <input type="email" id="newEmployeeEmail" name="newEmployeeEmail" placeholder="username@pngroup.co.il">
+                <input type="email" id="newEmployeeEmail" placeholder="user@domain.co.il">
             </div>
         </div>
 
-        <div class="form-group">
-            <label for="requestSubject">נושא הבקשה *</label>
-            <select id="requestSubject" name="requestSubject" required onchange="toggleSections()">
-                <option value="">-- נא לבחור נושא --</option>
-                <option value="טופס 106">טופס 106</option>
-                <option value="תלוש שכר">בקשת תלושי שכר</option>
-                <option value="הערה / בקשה כללית">הערה / בקשה כללית</option>
-            </select>
-        </div>
-
-        <div id="section106" class="fieldset-container" style="display: none;">
-            <div class="fieldset-title">פרטי בקשת טופס 106</div>
-            <div class="row">
-                <div class="col">
-                    <label for="form106StartYear">משנה</label>
-                    <select id="form106StartYear" name="form106StartYear">
-                        <option value="">בחר שנה</option>
-                        <option value="2026">2026</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
-                    </select>
-                </div>
-                <div class="col">
-                    <label for="form106EndYear">עד שנה</label>
-                    <select id="form106EndYear" name="form106EndYear">
-                        <option value="">בחר שנה</option>
-                        <option value="2026">2026</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
-                    </select>
-                </div>
+        <!-- אזור 3 פניות אחרונות והתכתבויות -->
+        <div id="historySection" class="history-section">
+            <div class="history-header">
+                <div class="history-title">📑 פניות אחרונות שלך</div>
+                <button type="button" class="btn-toggle-new" id="toggleNewInquiryBtn" onclick="toggleNewInquiryForm()">➕ פתיחת פנייה חדשה</button>
+            </div>
+            <div id="inquiriesContainer">
+                <div style="text-align: center; color: #7f8c8d; font-size: 13px; padding: 10px;">טוען היסטוריית פניות...</div>
             </div>
         </div>
 
-        <div id="sectionSlips" class="fieldset-container" style="display: none;">
-            <div class="fieldset-title">פרטי בקשת תלושי שכר</div>
+        <!-- טופס פנייה חדשה -->
+        <form id="payrollForm" enctype="multipart/form-data" style="display: none;">
+            <input type="hidden" id="company" name="company" value="">
+            <input type="hidden" id="selectedEmployeeHidden" name="employeeName" value="">
             
-            <p style="margin: 0 0 10px 0; font-size: 13px; font-weight: bold;">מחודש ושנה:</p>
-            <div class="row" style="margin-bottom: 10px;">
-                <div class="col">
-                    <select id="slipStartMonth" name="slipStartMonth">
-                        <option value="">חודש</option>
-                        <option value="01">ינואר (01)</option>
-                        <option value="02">פברואר (02)</option>
-                        <option value="03">מרץ (03)</option>
-                        <option value="04">אפריל (04)</option>
-                        <option value="05">מאי (05)</option>
-                        <option value="06">יוני (06)</option>
-                        <option value="07">יולי (07)</option>
-                        <option value="08">אוגוסט (08)</option>
-                        <option value="09">ספטמבר (09)</option>
-                        <option value="10">אוקטובר (10)</option>
-                        <option value="11">נובמבר (11)</option>
-                        <option value="12">דצמבר (12)</option>
-                    </select>
-                </div>
-                <div class="col">
-                    <select id="slipStartYear" name="slipStartYear">
-                        <option value="">שנה</option>
-                        <option value="2026">2026</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                    </select>
+            <div class="fieldset-title" id="newInquiryFormTitle">📝 פתיחת פנייה חדשה</div>
+
+            <div class="form-group">
+                <label for="requestSubject">נושא הבקשה *</label>
+                <select id="requestSubject" name="requestSubject" required onchange="toggleSections()">
+                    <option value="">-- נא לבחור נושא --</option>
+                    <option value="טופס 106">טופס 106</option>
+                    <option value="תלוש שכר">בקשת תלושי שכר</option>
+                    <option value="הערה / בקשה כללית">הערה / בקשה כללית</option>
+                </select>
+            </div>
+
+            <div id="section106" class="fieldset-container" style="display: none;">
+                <div class="fieldset-title">פרטי בקשת טופס 106</div>
+                <div class="row">
+                    <div class="col">
+                        <label for="form106StartYear">משנה</label>
+                        <select id="form106StartYear" name="form106StartYear">
+                            <option value="">בחר שנה</option>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="form106EndYear">עד שנה</label>
+                        <select id="form106EndYear" name="form106EndYear">
+                            <option value="">בחר שנה</option>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <p style="margin: 10px 0 10px 0; font-size: 13px; font-weight: bold;">עד חודש ושנה:</p>
-            <div class="row">
-                <div class="col">
-                    <select id="slipEndMonth" name="slipEndMonth">
-                        <option value="">חודש</option>
-                        <option value="01">ינואר (01)</option>
-                        <option value="02">פברואר (02)</option>
-                        <option value="03">מרץ (03)</option>
-                        <option value="04">אפריל (04)</option>
-                        <option value="05">מאי (05)</option>
-                        <option value="06">יוני (06)</option>
-                        <option value="07">יולי (07)</option>
-                        <option value="08">אוגוסט (08)</option>
-                        <option value="09">ספטמבר (09)</option>
-                        <option value="10">אוקטובר (10)</option>
-                        <option value="11">נובמבר (11)</option>
-                        <option value="12">דצמבר (12)</option>
-                    </select>
+            <div id="sectionSlips" class="fieldset-container" style="display: none;">
+                <div class="fieldset-title">פרטי בקשת תלושי שכר</div>
+                <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: bold;">מחודש ושנה:</p>
+                <div class="row" style="margin-bottom: 10px;">
+                    <div class="col">
+                        <select id="slipStartMonth" name="slipStartMonth">
+                            <option value="">חודש</option>
+                            <option value="01">ינואר (01)</option>
+                            <option value="02">פברואר (02)</option>
+                            <option value="03">מרץ (03)</option>
+                            <option value="04">אפריל (04)</option>
+                            <option value="05">מאי (05)</option>
+                            <option value="06">יוני (06)</option>
+                            <option value="07">יולי (07)</option>
+                            <option value="08">אוגוסט (08)</option>
+                            <option value="09">ספטמבר (09)</option>
+                            <option value="10">אוקטובר (10)</option>
+                            <option value="11">נובמבר (11)</option>
+                            <option value="12">דצמבר (12)</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <select id="slipStartYear" name="slipStartYear">
+                            <option value="">שנה</option>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="col">
-                    <select id="slipEndYear" name="slipEndYear">
-                        <option value="">שנה</option>
-                        <option value="2026">2026</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                    </select>
+
+                <p style="margin: 10px 0 8px 0; font-size: 13px; font-weight: bold;">עד חודש ושנה:</p>
+                <div class="row">
+                    <div class="col">
+                        <select id="slipEndMonth" name="slipEndMonth">
+                            <option value="">חודש</option>
+                            <option value="01">ינואר (01)</option>
+                            <option value="02">פברואר (02)</option>
+                            <option value="03">מרץ (03)</option>
+                            <option value="04">אפריל (04)</option>
+                            <option value="05">מאי (05)</option>
+                            <option value="06">יוני (06)</option>
+                            <option value="07">יולי (07)</option>
+                            <option value="08">אוגוסט (08)</option>
+                            <option value="09">ספטמבר (09)</option>
+                            <option value="10">אוקטובר (10)</option>
+                            <option value="11">נובמבר (11)</option>
+                            <option value="12">דצמבר (12)</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <select id="slipEndYear" name="slipEndYear">
+                            <option value="">שנה</option>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label for="generalRequests">תוכן הבקשה / פירוט נוסף</label>
-            <textarea id="generalRequests" name="generalRequests" placeholder="פרט כאן את בקשתך..."></textarea>
-        </div>
-
-        <div class="form-group">
-            <label>צירוף מסמכים / קבצים (עד 3 קבצים)</label>
-            <div class="file-inputs">
-                <input type="file" name="file1">
-                <input type="file" name="file2">
-                <input type="file" name="file3">
+            <div class="form-group">
+                <label for="generalRequests">תוכן הבקשה / פירוט נוסף *</label>
+                <textarea id="generalRequests" name="generalRequests" required placeholder="פרט כאן את בקשתך..."></textarea>
             </div>
-            <div class="note">ניתן לצרף קבצי PDF, תמונות וכד' הרלוונטיים לבקשה.</div>
-        </div>
 
-        <button type="submit" id="submitBtn">שלח בקשה לפורטל</button>
-    </form>
+            <div class="form-group">
+                <label>צירוף מסמכים / קבצים (עד 3 קבצים)</label>
+                <div class="file-inputs">
+                    <input type="file" name="file1">
+                    <input type="file" name="file2">
+                    <input type="file" name="file3">
+                </div>
+                <div class="note">ניתן לצרף קבצי PDF, תמונות וכד'.</div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">שלח בקשה</button>
+        </form>
+    </div>
 </div>
 
 <script>
     const SPREADSHEET_ID = "1k3kyQX2usPvs5xe6q1203CUZS1rcRQcp2E_H8CMVu8M"; 
-    const SHEET_GID = "1812873594"; 
-    
+    const EMPLOYEES_GID = "1812873594"; // גיליון עובדים
+    const INQUIRIES_SHEET_NAME = "Sheet1"; // טבלת פניות ראשית
+    const MESSAGES_SHEET_NAME = "הודעות פנייה"; // טבלת הודעות מקושרות
+    const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/2d79o32chny5995mdvvc3ok2pa9ov236";
+
     // זיהוי החברה מה-URL
     const urlParams = new URLSearchParams(window.location.search);
     let targetCompany = (urlParams.get('company') || '').trim();
-    
+
     if (targetCompany === 'pais' || targetCompany === 'פיס') {
         targetCompany = 'פיס';
     } else if (targetCompany === 'peernesher' || targetCompany === 'פאר נשר') {
         targetCompany = 'פאר נשר';
     }
 
-    // בדיקה האם הוגדרה חברה תקינה
     if (!targetCompany) {
-        // אין חברה: מסתירים את הטופס ומציגים את מסך הבחירה
-        document.getElementById("payrollForm").style.display = "none";
-        document.getElementById("portalHeader").style.display = "none";
+        document.getElementById("portalMainContent").style.display = "none";
         document.getElementById("noCompanyBlock").style.display = "block";
     } else {
-        // יש חברה: מגדירים את הערך הנסתר ואת הכותרת
         document.getElementById("company").value = targetCompany;
         document.getElementById("portalHeader").innerText = `פורטל שכר - ${targetCompany}`;
         document.title = `פורטל שכר - ${targetCompany}`;
     }
 
     let existingEmployees = [];
+    let currentInquiries = [];
 
     window.addEventListener("DOMContentLoaded", function() {
-        // אם אין חברה, אין צורך להטעין את רשימת העובדים
         if (!targetCompany) return;
 
-        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
+        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${EMPLOYEES_GID}`;
         const employeeSelect = document.getElementById("employeeName");
 
         fetch(url)
-            .then(response => response.text())
+            .then(res => res.text())
             .then(txt => {
                 const jsonString = txt.substring(txt.indexOf('{'), txt.lastIndexOf('}') + 1);
                 const json = JSON.parse(jsonString);
                 const rows = json.table.rows;
-                
+
                 employeeSelect.innerHTML = '<option value="">-- נא לבחור שם מהרשימה --</option>';
                 existingEmployees = [];
-                
+
                 rows.forEach(row => {
                     if (row.c && row.c[0] && row.c[0].v) {
                         const name = row.c[0].v.toString().trim();
                         const company = (row.c[2] && row.c[2].v) ? row.c[2].v.toString().trim() : '';
-
-                        if (name && name !== "שם עובד" && name !== "שם העובד") {
-                            // סינון לפי החברה הנבחרת
+                        if (name && !name.includes("שם עובד")) {
                             if (company === targetCompany) {
                                 existingEmployees.push(name);
                             }
@@ -425,128 +582,332 @@
                     }
                 });
 
-                // מיון שמות לעברית
                 existingEmployees.sort((a, b) => a.localeCompare(b, 'he'));
 
-                // אופציית עובד חדש
                 const newEmpOption = document.createElement("option");
                 newEmpOption.value = "__NEW_EMPLOYEE__";
                 newEmpOption.textContent = "⭐ עובד חדש / השם שלי לא מופיע";
                 employeeSelect.appendChild(newEmpOption);
 
-                // הזרקת שאר השמות
                 existingEmployees.forEach(name => {
-                    const option = document.createElement("option");
-                    option.value = name;
-                    option.textContent = name;
-                    employeeSelect.appendChild(option);
+                    const opt = document.createElement("option");
+                    opt.value = name;
+                    opt.textContent = name;
+                    employeeSelect.appendChild(opt);
                 });
             })
-            .catch(error => {
-                console.error("Error loading employees:", error);
-                employeeSelect.innerHTML = '<option value="">שגיאה בטעינת עובדים, נא לרענן</option>';
+            .catch(err => {
+                console.error("Error loading employees:", err);
+                employeeSelect.innerHTML = '<option value="">שגיאה בטעינת עובדים</option>';
             });
     });
 
-    function checkNewEmployeeCSS(val) {
-        var section = document.getElementById("newEmployeeSection");
-        var newNameInput = document.getElementById("newEmployeeName");
-        var newEmailInput = document.getElementById("newEmployeeEmail");
+    // כאשר נבחר עובד
+    function onEmployeeSelected(name) {
+        const historySection = document.getElementById("historySection");
+        const payrollForm = document.getElementById("payrollForm");
+        const newEmpSection = document.getElementById("newEmployeeSection");
+        const selectedEmployeeHidden = document.getElementById("selectedEmployeeHidden");
 
-        if (val === "__NEW_EMPLOYEE__") {
-            section.style.display = "block";
-            newNameInput.required = true;
-            newEmailInput.required = true;
-            validateUniqueName(newNameInput.value);
-        } else {
-            section.style.display = "none";
-            newNameInput.required = false;
-            newEmailInput.required = false;
-            newNameInput.value = "";
-            newEmailInput.value = "";
-            document.getElementById("nameErrorBox").style.display = "none";
-            document.getElementById("submitBtn").disabled = false;
+        selectedEmployeeHidden.value = name;
+
+        if (name === "__NEW_EMPLOYEE__") {
+            newEmpSection.style.display = "block";
+            historySection.style.display = "none";
+            payrollForm.style.display = "block";
+            document.getElementById("newEmployeeName").required = true;
+            document.getElementById("newEmployeeEmail").required = true;
+            return;
+        }
+
+        newEmpSection.style.display = "none";
+        document.getElementById("newEmployeeName").required = false;
+        document.getElementById("newEmployeeEmail").required = false;
+
+        if (!name) {
+            historySection.style.display = "none";
+            payrollForm.style.display = "none";
+            return;
+        }
+
+        // טעינת 3 הפניות האחרונות של העובד
+        loadEmployeeInquiries(name);
+    }
+
+    // טעינת פניות והודעות מ-Google Sheets באמצעות gviz
+    function loadEmployeeInquiries(employeeName) {
+        const historySection = document.getElementById("historySection");
+        const container = document.getElementById("inquiriesContainer");
+        const payrollForm = document.getElementById("payrollForm");
+        const toggleBtn = document.getElementById("toggleNewInquiryBtn");
+
+        historySection.style.display = "block";
+        container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 13px; padding: 15px;">טוען פניות... ⏳</div>';
+
+        // שאילתה לטבלת הפניות הראשית (Sheet1)
+        const inquiriesUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(INQUIRIES_SHEET_NAME)}`;
+        const messagesUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(MESSAGES_SHEET_NAME)}`;
+
+        Promise.all([
+            fetch(inquiriesUrl).then(r => r.text()),
+            fetch(messagesUrl).then(r => r.text())
+        ])
+        .then(([inquiriesTxt, messagesTxt]) => {
+            const inqJson = JSON.parse(inquiriesTxt.substring(inquiriesTxt.indexOf('{'), inquiriesTxt.lastIndexOf('}') + 1));
+            const msgJson = JSON.parse(messagesTxt.substring(messagesTxt.indexOf('{'), messagesTxt.lastIndexOf('}') + 1));
+
+            // מיפוי הודעות לפי מזהה פנייה (עמודה B: מזהה פנייה, עמודה C: תאריך, עמודה D: מאת, עמודה E: תוכן)
+            const messagesByInquiry = {};
+            msgJson.table.rows.forEach(row => {
+                if (row.c && row.c[1] && row.c[1].v) {
+                    const inqId = row.c[1].v.toString().trim();
+                    const dateVal = (row.c[2] && row.c[2].f) ? row.c[2].f : ((row.c[2] && row.c[2].v) ? row.c[2].v : '');
+                    const sender = (row.c[3] && row.c[3].v) ? row.c[3].v.toString().trim() : 'אודליה';
+                    const content = (row.c[4] && row.c[4].v) ? row.c[4].v.toString().trim() : '';
+
+                    if (!messagesByInquiry[inqId]) messagesByInquiry[inqId] = [];
+                    messagesByInquiry[inqId].push({ date: dateVal, sender, content });
+                }
+            });
+
+            // סינון פניות לפי שם העובד
+            // עמודה A: תאריך יצירה, עמודה B: שם עובד, עמודה C: נושא, עמודה G: סטטוס, עמודה L/A: ID
+            const matchingInquiries = [];
+            inqJson.table.rows.forEach((row, idx) => {
+                if (!row.c) return;
+                // חיפוש עמודות לפי שם או מיקום
+                const rowEmployee = (row.c[1] && row.c[1].v) ? row.c[1].v.toString().trim() : '';
+                
+                if (rowEmployee === employeeName) {
+                    // איתור שדה מזהה פנייה (ID)
+                    let inqId = '';
+                    // נבדוק עמודת ID (בדרך כלל עמודה 11 או האחרונה)
+                    for (let i = row.c.length - 1; i >= 0; i--) {
+                        if (row.c[i] && row.c[i].v && /^\d{9,12}$/.test(row.c[i].v.toString().trim())) {
+                            inqId = row.c[i].v.toString().trim();
+                            break;
+                        }
+                    }
+                    if (!inqId && row.c[0] && row.c[0].v) inqId = (idx + 1).toString();
+
+                    const dateCreated = (row.c[0] && (row.c[0].f || row.c[0].v)) ? (row.c[0].f || row.c[0].v) : '';
+                    const subject = (row.c[2] && row.c[2].v) ? row.c[2].v.toString().trim() : 'פנייה ללא נושא';
+                    const status = (row.c[6] && row.c[6].v) ? row.c[6].v.toString().trim() : 'פתוח';
+
+                    matchingInquiries.push({
+                        id: inqId,
+                        date: dateCreated,
+                        subject: subject,
+                        status: status,
+                        messages: messagesByInquiry[inqId] || []
+                    });
+                }
+            });
+
+            // לקיחת 3 הפניות האחרונות
+            currentInquiries = matchingInquiries.slice(-3).reverse();
+
+            if (currentInquiries.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 14px; padding: 15px;">אין פניות קודמות במערכת. באפשרותך לפתוח פנייה ראשונה!</div>';
+                payrollForm.style.display = "block";
+                toggleBtn.style.display = "none";
+            } else {
+                renderInquiries(currentInquiries);
+                toggleBtn.style.display = "inline-block";
+                payrollForm.style.display = "none"; // כברירת מחדל מוצגות הפניות, לחיצה על כפתור תפתח טופס חדש
+            }
+        })
+        .catch(err => {
+            console.error("Error fetching data:", err);
+            container.innerHTML = '<div style="text-align:center; color:#e74c3c; font-size:13px;">לא הצלחנו לטעון את הפניות הקודמות. ניתן לפתוח פנייה חדשה.</div>';
+            payrollForm.style.display = "block";
+        });
+    }
+
+    // רינדור רשימת הפניות
+    function renderInquiries(inquiries) {
+        const container = document.getElementById("inquiriesContainer");
+        container.innerHTML = "";
+
+        inquiries.forEach((inq, index) => {
+            const card = document.createElement("div");
+            card.className = "inquiry-card";
+
+            let statusClass = "status-open";
+            if (inq.status.includes("מייל") || inq.status.includes("מענה")) statusClass = "status-replied";
+            if (inq.status.includes("סגור")) statusClass = "status-closed";
+
+            let messagesHtml = "";
+            if (inq.messages && inq.messages.length > 0) {
+                messagesHtml = inq.messages.map(m => {
+                    const isEmployee = m.sender !== "אודליה";
+                    return `
+                        <div class="chat-bubble ${isEmployee ? 'bubble-employee' : 'bubble-admin'}">
+                            <div class="chat-meta">${m.sender} • ${m.date}</div>
+                            <div>${escapeHtml(m.content)}</div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                messagesHtml = `<div style="font-size: 12px; color: #95a5a6; text-align: center; padding: 5px;">אין עדיין הודעות בשרשור זה.</div>`;
+            }
+
+            card.innerHTML = `
+                <div class="inquiry-top">
+                    <span class="inquiry-subject">${escapeHtml(inq.subject)}</span>
+                    <span class="inquiry-status ${statusClass}">${escapeHtml(inq.status)}</span>
+                </div>
+                <div class="inquiry-date">נפתחה בתאריך: ${inq.date}</div>
+                <div class="chat-thread">
+                    ${messagesHtml}
+                </div>
+                <div class="reply-box">
+                    <input type="text" class="reply-input" id="replyInput_${inq.id}" placeholder="כתוב תגובה לאודליה..." onkeypress="handleReplyKey(event, '${inq.id}')">
+                    <button type="button" class="btn-reply" id="replyBtn_${inq.id}" onclick="sendReply('${inq.id}')">שלח מענה</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function handleReplyKey(e, inqId) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            sendReply(inqId);
         }
     }
 
-    function validateUniqueName(typedName) {
-        const trimmedName = typedName.trim();
-        const errorBox = document.getElementById("nameErrorBox");
-        const submitBtn = document.getElementById("submitBtn");
-        const select = document.getElementById("employeeName");
+    // שליחת תגובה לפנייה קיימת
+    function sendReply(inquiryId) {
+        const input = document.getElementById(`replyInput_${inquiryId}`);
+        const btn = document.getElementById(`replyBtn_${inquiryId}`);
+        const text = input.value.trim();
+        const employeeName = document.getElementById("employeeName").value;
 
-        if (select.value === "__NEW_EMPLOYEE__" && trimmedName.length > 0) {
-            const nameExists = existingEmployees.some(emp => emp.toLowerCase() === trimmedName.toLowerCase());
+        if (!text) {
+            alert("אנא כתוב תוכן להודעה לפני השליחה.");
+            return;
+        }
 
-            if (nameExists) {
-                errorBox.style.display = "block";
-                submitBtn.disabled = true;
-            } else {
-                errorBox.style.display = "none";
-                submitBtn.disabled = false;
-            }
+        btn.disabled = true;
+        btn.innerText = "שולח...";
+
+        const payload = new FormData();
+        payload.append("action", "reply");
+        payload.append("inquiryId", inquiryId);
+        payload.append("employeeName", employeeName);
+        payload.append("messageContent", text);
+        payload.append("company", targetCompany);
+
+        fetch(MAKE_WEBHOOK_URL, {
+            method: "POST",
+            body: payload
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Error sending reply");
+            input.value = "";
+            showAlert("התגובה נשלחה בהצלחה! היא תופיע בהתכתבות בעוד מספר רגעים.", "success");
+            setTimeout(() => loadEmployeeInquiries(employeeName), 1500);
+        })
+        .catch(err => {
+            console.error(err);
+            showAlert("חלה שגיאה בשליחת התגובה. נסה שוב.", "error");
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerText = "שלח מענה";
+        });
+    }
+
+    // מעבר בין פניות קיימות לפתיחת פנייה חדשה
+    function toggleNewInquiryForm() {
+        const payrollForm = document.getElementById("payrollForm");
+        const toggleBtn = document.getElementById("toggleNewInquiryBtn");
+        
+        if (payrollForm.style.display === "none") {
+            payrollForm.style.display = "block";
+            toggleBtn.innerText = "✖ סגור פנייה חדשה";
+            toggleBtn.classList.add("active");
+            payrollForm.scrollIntoView({ behavior: 'smooth' });
         } else {
-            errorBox.style.display = "none";
-            if (submitBtn.innerText !== "שולח בקשה...") {
-                submitBtn.disabled = false;
-            }
+            payrollForm.style.display = "none";
+            toggleBtn.innerText = "➕ פתיחת פנייה חדשה";
+            toggleBtn.classList.remove("active");
         }
     }
 
     function toggleSections() {
-        var subject = document.getElementById("requestSubject").value;
-        var section106 = document.getElementById("section106");
-        var sectionSlips = document.getElementById("sectionSlips");
+        const subject = document.getElementById("requestSubject").value;
+        const s106 = document.getElementById("section106");
+        const sSlips = document.getElementById("sectionSlips");
+        s106.style.display = (subject === "טופס 106") ? "block" : "none";
+        sSlips.style.display = (subject === "תלוש שכר") ? "block" : "none";
+    }
 
-        section106.style.display = "none";
-        sectionSlips.style.display = "none";
+    function validateUniqueName(typedName) {
+        const trimmed = typedName.trim();
+        const errorBox = document.getElementById("nameErrorBox");
+        const submitBtn = document.getElementById("submitBtn");
+        const nameExists = existingEmployees.some(e => e.toLowerCase() === trimmed.toLowerCase());
 
-        if (subject === "טופס 106") {
-            section106.style.display = "block";
-        } else if (subject === "תלוש שכר") {
-            sectionSlips.style.display = "block";
+        if (nameExists && trimmed.length > 0) {
+            errorBox.style.display = "block";
+            submitBtn.disabled = true;
+        } else {
+            errorBox.style.display = "none";
+            submitBtn.disabled = false;
         }
     }
 
-    document.getElementById("payrollForm").addEventListener("submit", function(event) {
-        event.preventDefault();
+    function showAlert(msg, type) {
+        const alertBox = document.getElementById("alertBox");
+        alertBox.innerText = msg;
+        alertBox.className = `alert-message alert-${type}`;
+        alertBox.style.display = "block";
+        alertBox.scrollIntoView({ behavior: 'smooth' });
+    }
 
-        var form = event.target;
-        var submitBtn = document.getElementById("submitBtn");
-        var alertBox = document.getElementById("alertBox");
-        var formData = new FormData(form);
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // הגשת טופס פנייה חדשה
+    document.getElementById("payrollForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const submitBtn = document.getElementById("submitBtn");
+        const formData = new FormData(form);
 
         submitBtn.disabled = true;
         submitBtn.innerText = "שולח בקשה...";
-        alertBox.style.display = "none";
-        alertBox.className = "alert-message";
 
-        fetch("https://hook.eu1.make.com/2d79o32chny5995mdvvc3ok2pa9ov236", {
+        fetch(MAKE_WEBHOOK_URL, {
             method: "POST",
             body: formData
         })
-        .then(function(response) {
-            if (response.ok) {
-                alertBox.innerText = "הבקשה נשלחה בהצלחה! הנתונים הוכנסו לפורטל.";
-                alertBox.classList.add("alert-success");
-                alertBox.style.display = "block";
-                form.reset();
-                toggleSections();
-                checkNewEmployeeCSS(""); 
-            } else {
-                throw new Error("Server error");
+        .then(res => {
+            if (!res.ok) throw new Error("Server error");
+            showAlert("הבקשה נשלחה בהצלחה! היא נוספה לרשימת הפניות שלך.", "success");
+            form.reset();
+            toggleSections();
+            const empName = document.getElementById("employeeName").value;
+            if (empName && empName !== "__NEW_EMPLOYEE__") {
+                setTimeout(() => loadEmployeeInquiries(empName), 1500);
             }
         })
-        .catch(function(error) {
-            alertBox.innerText = "חלה שגיאה בשליחת הנתונים. אנא נסה שנית או פנה לעדי.";
-            alertBox.classList.add("alert-error");
-            alertBox.style.display = "block";
+        .catch(err => {
+            console.error(err);
+            showAlert("חלה שגיאה בשליחת הבקשה. אנא נסה שנית.", "error");
         })
-        .finally(function() {
-            if (document.getElementById("nameErrorBox").style.display !== "block") {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "שלח בקשה לפורטל";
-            }
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "שלח בקשה";
         });
     });
 </script>
