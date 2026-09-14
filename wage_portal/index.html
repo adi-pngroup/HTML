@@ -230,6 +230,7 @@
             background-color: var(--primary-dark);
         }
 
+        /* חלון מודאלי */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -288,7 +289,7 @@
 
         .fieldset-container {
             border: 1px solid #e2e8f0;
-            padding: 15px;
+            padding: 14px;
             border-radius: 8px;
             margin-bottom: 16px;
             background-color: #fafbfc;
@@ -388,25 +389,7 @@
             </select>
         </div>
 
-        <!-- רישום עובד חדש -->
-        <div id="newEmployeeSection" class="fieldset-container" style="display: none;">
-            <div class="fieldset-title" style="color: #e67e22;">רישום עובד חדש במערכת *</div>
-            <p style="margin: 0 0 10px 0; font-size: 13px; color: #666;">השם שלך לא מופיע ברשימה? מלא את פרטייך והמערכת תעדכן אותך אוטומטית להבא.</p>
-            <div class="form-group">
-                <label for="newEmployeeName">שם מלא בעברית *</label>
-                <input type="text" id="newEmployeeName" name="newEmployeeName" placeholder="לדוגמה: ישראל ישראלי" oninput="validateUniqueName(this.value)">
-                <div id="nameErrorBox" style="color:red; font-size:13px; font-weight:bold; margin-top:5px; display:none;">⚠️ עובד בשם זה כבר קיים ברשימה! נא לבחור את שמך מהרשימה למעלה.</div>
-            </div>
-            <div class="form-group">
-                <label for="newEmployeeEmail">כתובת מייל לקבלת עדכונים *</label>
-                <input type="email" id="newEmployeeEmail" name="newEmployeeEmail" placeholder="user@domain.co.il">
-            </div>
-            <button type="button" class="btn-submit" id="btnContinueNewEmp" onclick="proceedNewEmployee()" style="background-color: #e67e22; margin-top: 5px;">
-                המשך להגשת הבקשה ⬅️
-            </button>
-        </div>
-
-        <!-- אזור פניות קודמות -->
+        <!-- אזור פניות קודמות (יוצג רק עבור עובד קיים) -->
         <div id="historySection" class="history-section">
             <div class="history-top-bar">
                 <span class="history-title">📑 3 פניות אחרונות שלך</span>
@@ -431,6 +414,21 @@
             <input type="hidden" id="company" name="company" value="">
             <input type="hidden" id="selectedEmployeeHidden" name="employeeName" value="">
 
+            <!-- שדות רישום עובד חדש (מופיעים רק כשנבחר 'עובד חדש') -->
+            <div id="modalNewEmployeeFields" class="fieldset-container" style="display: none; border-color: #f39c12; background-color: #fffaf0;">
+                <div class="fieldset-title" style="color: #e67e22;">⭐ רישום עובד חדש במערכת</div>
+                <div class="form-group">
+                    <label for="newEmployeeName">שם מלא בעברית *</label>
+                    <input type="text" id="newEmployeeName" name="newEmployeeName" placeholder="לדוגמה: ישראל ישראלי" oninput="validateUniqueName(this.value)">
+                    <div id="nameErrorBox" style="color:red; font-size:13px; font-weight:bold; margin-top:5px; display:none;">⚠️ עובד בשם זה כבר קיים ברשימה!</div>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="newEmployeeEmail">כתובת מייל לקבלת עדכונים *</label>
+                    <input type="email" id="newEmployeeEmail" name="newEmployeeEmail" placeholder="user@domain.co.il">
+                </div>
+            </div>
+
+            <!-- שדות הבקשה -->
             <div class="form-group">
                 <label for="requestSubject">נושא הבקשה *</label>
                 <select id="requestSubject" name="requestSubject" required onchange="toggleSections()">
@@ -629,25 +627,28 @@
             });
     });
 
-    // בחירת עובד
+    // בחירת עובד מהרשימה
     function onEmployeeSelected(name) {
         const historySection = document.getElementById("historySection");
-        const newEmpSection = document.getElementById("newEmployeeSection");
         const selectedEmployeeHidden = document.getElementById("selectedEmployeeHidden");
+        const modalNewEmpFields = document.getElementById("modalNewEmployeeFields");
         const newNameInput = document.getElementById("newEmployeeName");
         const newEmailInput = document.getElementById("newEmployeeEmail");
 
         selectedEmployeeHidden.value = name;
 
         if (name === "__NEW_EMPLOYEE__") {
-            newEmpSection.style.display = "block";
-            historySection.style.display = "none";
+            // הפיכת שדות עובד חדש לשדות חובה והצגתם בראש הפופ-אפ
+            modalNewEmpFields.style.display = "block";
             newNameInput.required = true;
             newEmailInput.required = true;
+            historySection.style.display = "none";
+            openNewInquiryModal();
             return;
         }
 
-        newEmpSection.style.display = "none";
+        // עובד קיים
+        modalNewEmpFields.style.display = "none";
         newNameInput.required = false;
         newEmailInput.required = false;
 
@@ -658,34 +659,6 @@
 
         historySection.style.display = "block";
         loadEmployeeInquiries(name);
-    }
-
-    // מעבר להגשת בקשה עבור עובד חדש
-    function proceedNewEmployee() {
-        const nameInput = document.getElementById("newEmployeeName");
-        const emailInput = document.getElementById("newEmployeeEmail");
-        const nameVal = nameInput.value.trim();
-        const emailVal = emailInput.value.trim();
-        const errorBox = document.getElementById("nameErrorBox");
-
-        if (!nameVal) {
-            alert("נא להזין שם מלא.");
-            nameInput.focus();
-            return;
-        }
-
-        if (errorBox.style.display === "block") {
-            alert("עובד זה כבר קיים ברשימה. נא לבחור אותו מהתפריט למעלה.");
-            return;
-        }
-
-        if (!emailVal || !emailVal.includes("@")) {
-            alert("נא להזין כתובת מייל תקינה.");
-            emailInput.focus();
-            return;
-        }
-
-        openNewInquiryModal();
     }
 
     function openNewInquiryModal() {
@@ -705,7 +678,7 @@
         }
     };
 
-    // טעינת פניות והודעות
+    // טעינת היסטוריית פניות
     function loadEmployeeInquiries(employeeName) {
         const container = document.getElementById("inquiriesContainer");
         container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 13px; padding: 20px;">טוען היסטוריית פניות... ⏳</div>';
@@ -882,15 +855,15 @@
     function validateUniqueName(typedName) {
         const trimmed = typedName.trim();
         const errorBox = document.getElementById("nameErrorBox");
-        const continueBtn = document.getElementById("btnContinueNewEmp");
+        const submitBtn = document.getElementById("submitBtn");
         const nameExists = existingEmployees.some(e => e.toLowerCase() === trimmed.toLowerCase());
 
         if (nameExists && trimmed.length > 0) {
             errorBox.style.display = "block";
-            if (continueBtn) continueBtn.disabled = true;
+            submitBtn.disabled = true;
         } else {
             errorBox.style.display = "none";
-            if (continueBtn) continueBtn.disabled = false;
+            submitBtn.disabled = false;
         }
     }
 
@@ -912,14 +885,14 @@
             .replace(/'/g, '&#039;');
     }
 
-    // שליחת טופס פנייה חדשה
+    // שליחת טופס פנייה חדשה מתוך המודאל
     document.getElementById("payrollForm").addEventListener("submit", function(e) {
         e.preventDefault();
         const form = e.target;
         const submitBtn = document.getElementById("submitBtn");
         const formData = new FormData(form);
 
-        // הוספת פרטי עובד חדש במידה ונבחרה אפשרות זו
+        // הוספת פרטי עובד חדש אם נבחרה אופציה זו
         const employeeSelectVal = document.getElementById("employeeName").value;
         if (employeeSelectVal === "__NEW_EMPLOYEE__") {
             const newName = document.getElementById("newEmployeeName").value.trim();
