@@ -81,72 +81,76 @@
 
         textarea {
             resize: vertical;
-            min-height: 85px;
+            min-height: 90px;
         }
 
-        /* כרטיסיות פניות קודמות */
-        .history-section {
-            margin: 20px 0 25px 0;
-            display: none;
-        }
-
-        .history-header {
+        /* לשוניות ניווט ברורות */
+        .portal-tabs {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
+            gap: 12px;
+            margin: 20px 0;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 10px;
         }
 
-        .history-title {
-            font-size: 16px;
+        .portal-tab-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 15px;
             font-weight: bold;
-            color: #2c3e50;
+            border: 1px solid #dcdfe6;
+            border-radius: 8px;
+            background-color: #f8fafc;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
         }
 
-        .btn-toggle-new {
-            background-color: #ecf0f1;
-            color: #2c3e50;
-            border: 1px solid #bdc3c7;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
+        .portal-tab-btn:hover {
+            background-color: #edf2f7;
         }
 
-        .btn-toggle-new:hover, .btn-toggle-new.active {
+        .portal-tab-btn.active {
             background-color: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
+            box-shadow: 0 3px 8px rgba(74, 144, 226, 0.25);
+        }
+
+        /* אזור פניות קודמות */
+        .history-section {
+            margin: 10px 0 20px 0;
+            display: none;
         }
 
         .inquiry-card {
             border: 1px solid #e1e8ed;
             border-radius: 8px;
-            padding: 14px;
-            margin-bottom: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
             background-color: #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
             transition: box-shadow 0.2s;
         }
 
         .inquiry-card:hover {
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
         }
 
         .inquiry-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .inquiry-subject {
             font-weight: bold;
-            font-size: 15px;
+            font-size: 16px;
             color: #2c3e50;
         }
 
@@ -165,25 +169,25 @@
         .inquiry-date {
             font-size: 12px;
             color: #7f8c8d;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
-        /* שרשור הודעות בתוך הפנייה */
+        /* שרשור הודעות בתוך כרטיסיית הפנייה */
         .chat-thread {
             background-color: #f8fafc;
-            border-radius: 6px;
-            padding: 10px;
-            margin: 10px 0;
-            max-height: 220px;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0 14px 0;
+            max-height: 240px;
             overflow-y: auto;
             border: 1px solid #edf2f7;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
         .chat-bubble {
-            padding: 8px 12px;
+            padding: 9px 13px;
             border-radius: 8px;
             font-size: 13px;
             max-width: 85%;
@@ -205,9 +209,9 @@
 
         .chat-meta {
             font-size: 11px;
-            color: #888;
-            margin-bottom: 3px;
-            font-weight: bold;
+            color: #7f8c8d;
+            margin-bottom: 4px;
+            font-weight: 600;
         }
 
         .reply-box {
@@ -218,14 +222,14 @@
 
         .reply-input {
             flex: 1;
-            padding: 8px 10px;
+            padding: 9px 12px;
             font-size: 13px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
         }
 
         .btn-reply {
-            padding: 8px 16px;
+            padding: 9px 18px;
             background-color: var(--primary-color);
             color: white;
             border: none;
@@ -234,13 +238,23 @@
             font-size: 13px;
             cursor: pointer;
             white-space: nowrap;
+            transition: background-color 0.2s;
         }
 
         .btn-reply:hover {
             background-color: var(--primary-dark);
         }
 
-        /* סגנון טופס פנייה חדשה */
+        /* עיצוב טופס פנייה חדשה */
+        #payrollForm {
+            border: 2px solid #4a90e2;
+            padding: 22px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.08);
+            display: none;
+        }
+
         .fieldset-container {
             border: 1px solid #e2e8f0;
             padding: 15px;
@@ -319,7 +333,7 @@
             border: 1px solid var(--error-color);
         }
 
-        /* בחירת חברה */
+        /* מסך בחירת חברה כשאין פרמטר ב-URL */
         .company-selection-screen {
             text-align: center;
             padding: 15px 10px;
@@ -374,11 +388,11 @@
         <!-- רישום עובד חדש -->
         <div id="newEmployeeSection" class="fieldset-container" style="display: none;">
             <div class="fieldset-title" style="color: #e67e22;">רישום עובד חדש במערכת *</div>
-            <p style="margin: 0 0 10px 0; font-size: 13px; color: #666;">השם שלך לא ברשימה? מלא את פרטייך והמערכת תזהה אותך להבא.</p>
+            <p style="margin: 0 0 10px 0; font-size: 13px; color: #666;">השם שלך לא מופיע ברשימה? מלא את פרטייך והמערכת תעדכן אותך אוטומטית להבא.</p>
             <div class="form-group">
                 <label for="newEmployeeName">שם מלא בעברית *</label>
                 <input type="text" id="newEmployeeName" placeholder="לדוגמה: ישראל ישראלי" oninput="validateUniqueName(this.value)">
-                <div id="nameErrorBox" style="color:red; font-size:13px; font-weight:bold; margin-top:5px; display:none;">⚠️ עובד בשם זה כבר קיים ברשימה!</div>
+                <div id="nameErrorBox" style="color:red; font-size:13px; font-weight:bold; margin-top:5px; display:none;">⚠️ עובד בשם זה כבר קיים ברשימה! נא לבחור את שמך מהרשימה למעלה.</div>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
                 <label for="newEmployeeEmail">כתובת מייל לקבלת עדכונים *</label>
@@ -386,23 +400,29 @@
             </div>
         </div>
 
+        <!-- לשוניות ניווט בין היסטוריה לפנייה חדשה -->
+        <div id="tabsContainer" class="portal-tabs" style="display: none;">
+            <button type="button" class="portal-tab-btn active" id="tabHistoryBtn" onclick="switchView('history')">
+                💬 פניות קודמות
+            </button>
+            <button type="button" class="portal-tab-btn" id="tabNewBtn" onclick="switchView('new')">
+                ➕ פתיחת פנייה חדשה
+            </button>
+        </div>
+
         <!-- אזור 3 פניות אחרונות והתכתבויות -->
         <div id="historySection" class="history-section">
-            <div class="history-header">
-                <div class="history-title">📑 פניות אחרונות שלך</div>
-                <button type="button" class="btn-toggle-new" id="toggleNewInquiryBtn" onclick="toggleNewInquiryForm()">➕ פתיחת פנייה חדשה</button>
-            </div>
             <div id="inquiriesContainer">
-                <div style="text-align: center; color: #7f8c8d; font-size: 13px; padding: 10px;">טוען היסטוריית פניות...</div>
+                <div style="text-align: center; color: #7f8c8d; font-size: 13px; padding: 15px;">טוען פניות... ⏳</div>
             </div>
         </div>
 
-        <!-- טופס פנייה חדשה -->
-        <form id="payrollForm" enctype="multipart/form-data" style="display: none;">
+        <!-- טופס פתיחת פנייה חדשה -->
+        <form id="payrollForm" enctype="multipart/form-data">
             <input type="hidden" id="company" name="company" value="">
             <input type="hidden" id="selectedEmployeeHidden" name="employeeName" value="">
             
-            <div class="fieldset-title" id="newInquiryFormTitle">📝 פתיחת פנייה חדשה</div>
+            <div class="fieldset-title" style="font-size: 16px; margin-bottom: 16px;">📝 פתיחת פנייה חדשה</div>
 
             <div class="form-group">
                 <label for="requestSubject">נושא הבקשה *</label>
@@ -527,9 +547,9 @@
 
 <script>
     const SPREADSHEET_ID = "1k3kyQX2usPvs5xe6q1203CUZS1rcRQcp2E_H8CMVu8M"; 
-    const EMPLOYEES_GID = "1812873594"; // גיליון עובדים
-    const INQUIRIES_SHEET_NAME = "Sheet1"; // טבלת פניות ראשית
-    const MESSAGES_SHEET_NAME = "הודעות פנייה"; // טבלת הודעות מקושרות
+    const EMPLOYEES_GID = "1812873594";
+    const INQUIRIES_SHEET_NAME = "Sheet1";
+    const MESSAGES_SHEET_NAME = "הודעות פנייה";
     const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/2d79o32chny5995mdvvc3ok2pa9ov236";
 
     // זיהוי החברה מה-URL
@@ -598,53 +618,76 @@
             })
             .catch(err => {
                 console.error("Error loading employees:", err);
-                employeeSelect.innerHTML = '<option value="">שגיאה בטעינת עובדים</option>';
+                employeeSelect.innerHTML = '<option value="">שגיאה בטעינת רשימת עובדים</option>';
             });
     });
 
-    // כאשר נבחר עובד
+    // מעבר בין תצוגת היסטוריה לפנייה חדשה (Tabs)
+    function switchView(viewName) {
+        const historySection = document.getElementById("historySection");
+        const payrollForm = document.getElementById("payrollForm");
+        const tabHistoryBtn = document.getElementById("tabHistoryBtn");
+        const tabNewBtn = document.getElementById("tabNewBtn");
+
+        if (viewName === 'new') {
+            historySection.style.display = "none";
+            payrollForm.style.display = "block";
+            tabNewBtn.classList.add("active");
+            tabHistoryBtn.classList.remove("active");
+        } else {
+            historySection.style.display = "block";
+            payrollForm.style.display = "none";
+            tabHistoryBtn.classList.add("active");
+            tabNewBtn.classList.remove("active");
+        }
+    }
+
+    // בחירת עובד מה-Dropdown
     function onEmployeeSelected(name) {
+        const tabsContainer = document.getElementById("tabsContainer");
         const historySection = document.getElementById("historySection");
         const payrollForm = document.getElementById("payrollForm");
         const newEmpSection = document.getElementById("newEmployeeSection");
         const selectedEmployeeHidden = document.getElementById("selectedEmployeeHidden");
+        const newNameInput = document.getElementById("newEmployeeName");
+        const newEmailInput = document.getElementById("newEmployeeEmail");
 
         selectedEmployeeHidden.value = name;
 
         if (name === "__NEW_EMPLOYEE__") {
             newEmpSection.style.display = "block";
+            tabsContainer.style.display = "none";
             historySection.style.display = "none";
             payrollForm.style.display = "block";
-            document.getElementById("newEmployeeName").required = true;
-            document.getElementById("newEmployeeEmail").required = true;
+            newNameInput.required = true;
+            newEmailInput.required = true;
             return;
         }
 
         newEmpSection.style.display = "none";
-        document.getElementById("newEmployeeName").required = false;
-        document.getElementById("newEmployeeEmail").required = false;
+        newNameInput.required = false;
+        newEmailInput.required = false;
 
         if (!name) {
+            tabsContainer.style.display = "none";
             historySection.style.display = "none";
             payrollForm.style.display = "none";
             return;
         }
 
-        // טעינת 3 הפניות האחרונות של העובד
+        // עובד קיים נבחר: מציגים את הלשוניות ומפעילים את היסטוריית הפניות
+        tabsContainer.style.display = "flex";
+        switchView('history');
         loadEmployeeInquiries(name);
     }
 
-    // טעינת פניות והודעות מ-Google Sheets באמצעות gviz
+    // טעינת פניות והודעות של העובד
     function loadEmployeeInquiries(employeeName) {
         const historySection = document.getElementById("historySection");
         const container = document.getElementById("inquiriesContainer");
-        const payrollForm = document.getElementById("payrollForm");
-        const toggleBtn = document.getElementById("toggleNewInquiryBtn");
 
-        historySection.style.display = "block";
-        container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 13px; padding: 15px;">טוען פניות... ⏳</div>';
+        container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 13px; padding: 20px;">טוען היסטוריית פניות... ⏳</div>';
 
-        // שאילתה לטבלת הפניות הראשית (Sheet1)
         const inquiriesUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(INQUIRIES_SHEET_NAME)}`;
         const messagesUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(MESSAGES_SHEET_NAME)}`;
 
@@ -656,7 +699,7 @@
             const inqJson = JSON.parse(inquiriesTxt.substring(inquiriesTxt.indexOf('{'), inquiriesTxt.lastIndexOf('}') + 1));
             const msgJson = JSON.parse(messagesTxt.substring(messagesTxt.indexOf('{'), messagesTxt.lastIndexOf('}') + 1));
 
-            // מיפוי הודעות לפי מזהה פנייה (עמודה B: מזהה פנייה, עמודה C: תאריך, עמודה D: מאת, עמודה E: תוכן)
+            // בניית מילון הודעות לפי מזהה פנייה
             const messagesByInquiry = {};
             msgJson.table.rows.forEach(row => {
                 if (row.c && row.c[1] && row.c[1].v) {
@@ -671,17 +714,13 @@
             });
 
             // סינון פניות לפי שם העובד
-            // עמודה A: תאריך יצירה, עמודה B: שם עובד, עמודה C: נושא, עמודה G: סטטוס, עמודה L/A: ID
             const matchingInquiries = [];
             inqJson.table.rows.forEach((row, idx) => {
                 if (!row.c) return;
-                // חיפוש עמודות לפי שם או מיקום
                 const rowEmployee = (row.c[1] && row.c[1].v) ? row.c[1].v.toString().trim() : '';
                 
                 if (rowEmployee === employeeName) {
-                    // איתור שדה מזהה פנייה (ID)
                     let inqId = '';
-                    // נבדוק עמודת ID (בדרך כלל עמודה 11 או האחרונה)
                     for (let i = row.c.length - 1; i >= 0; i--) {
                         if (row.c[i] && row.c[i].v && /^\d{9,12}$/.test(row.c[i].v.toString().trim())) {
                             inqId = row.c[i].v.toString().trim();
@@ -704,32 +743,29 @@
                 }
             });
 
-            // לקיחת 3 הפניות האחרונות
+            // שמירת 3 הפניות האחרונות
             currentInquiries = matchingInquiries.slice(-3).reverse();
 
             if (currentInquiries.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 14px; padding: 15px;">אין פניות קודמות במערכת. באפשרותך לפתוח פנייה ראשונה!</div>';
-                payrollForm.style.display = "block";
-                toggleBtn.style.display = "none";
+                container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 14px; padding: 25px;">לא נמצאו פניות קודמות. מוזמן לפתוח פנייה חדשה בלשונית למעלה!</div>';
+                switchView('new');
             } else {
                 renderInquiries(currentInquiries);
-                toggleBtn.style.display = "inline-block";
-                payrollForm.style.display = "none"; // כברירת מחדל מוצגות הפניות, לחיצה על כפתור תפתח טופס חדש
             }
         })
         .catch(err => {
             console.error("Error fetching data:", err);
-            container.innerHTML = '<div style="text-align:center; color:#e74c3c; font-size:13px;">לא הצלחנו לטעון את הפניות הקודמות. ניתן לפתוח פנייה חדשה.</div>';
-            payrollForm.style.display = "block";
+            container.innerHTML = '<div style="text-align:center; color:#e74c3c; font-size:13px; padding: 15px;">לא הצלחנו לטעון את הפניות הקודמות. ניתן לפתוח פנייה חדשה.</div>';
+            switchView('new');
         });
     }
 
-    // רינדור רשימת הפניות
+    // הצגת הפניות במסך
     function renderInquiries(inquiries) {
         const container = document.getElementById("inquiriesContainer");
         container.innerHTML = "";
 
-        inquiries.forEach((inq, index) => {
+        inquiries.forEach((inq) => {
             const card = document.createElement("div");
             card.className = "inquiry-card";
 
@@ -743,7 +779,7 @@
                     const isEmployee = m.sender !== "אודליה";
                     return `
                         <div class="chat-bubble ${isEmployee ? 'bubble-employee' : 'bubble-admin'}">
-                            <div class="chat-meta">${m.sender} • ${m.date}</div>
+                            <div class="chat-meta">${escapeHtml(m.sender)} • ${escapeHtml(m.date)}</div>
                             <div>${escapeHtml(m.content)}</div>
                         </div>
                     `;
@@ -757,7 +793,7 @@
                     <span class="inquiry-subject">${escapeHtml(inq.subject)}</span>
                     <span class="inquiry-status ${statusClass}">${escapeHtml(inq.status)}</span>
                 </div>
-                <div class="inquiry-date">נפתחה בתאריך: ${inq.date}</div>
+                <div class="inquiry-date">נפתחה בתאריך: ${escapeHtml(inq.date)}</div>
                 <div class="chat-thread">
                     ${messagesHtml}
                 </div>
@@ -785,7 +821,7 @@
         const employeeName = document.getElementById("employeeName").value;
 
         if (!text) {
-            alert("אנא כתוב תוכן להודעה לפני השליחה.");
+            alert("נא להזין תוכן להודעה.");
             return;
         }
 
@@ -806,7 +842,7 @@
         .then(res => {
             if (!res.ok) throw new Error("Error sending reply");
             input.value = "";
-            showAlert("התגובה נשלחה בהצלחה! היא תופיע בהתכתבות בעוד מספר רגעים.", "success");
+            showAlert("התגובה נשלחה בהצלחה! היא תופיע בהתכתבות בעוד רגע.", "success");
             setTimeout(() => loadEmployeeInquiries(employeeName), 1500);
         })
         .catch(err => {
@@ -817,23 +853,6 @@
             btn.disabled = false;
             btn.innerText = "שלח מענה";
         });
-    }
-
-    // מעבר בין פניות קיימות לפתיחת פנייה חדשה
-    function toggleNewInquiryForm() {
-        const payrollForm = document.getElementById("payrollForm");
-        const toggleBtn = document.getElementById("toggleNewInquiryBtn");
-        
-        if (payrollForm.style.display === "none") {
-            payrollForm.style.display = "block";
-            toggleBtn.innerText = "✖ סגור פנייה חדשה";
-            toggleBtn.classList.add("active");
-            payrollForm.scrollIntoView({ behavior: 'smooth' });
-        } else {
-            payrollForm.style.display = "none";
-            toggleBtn.innerText = "➕ פתיחת פנייה חדשה";
-            toggleBtn.classList.remove("active");
-        }
     }
 
     function toggleSections() {
@@ -877,7 +896,7 @@
             .replace(/'/g, '&#039;');
     }
 
-    // הגשת טופס פנייה חדשה
+    // הגשת טופס פתיחת פנייה חדשה
     document.getElementById("payrollForm").addEventListener("submit", function(e) {
         e.preventDefault();
         const form = e.target;
@@ -898,6 +917,7 @@
             toggleSections();
             const empName = document.getElementById("employeeName").value;
             if (empName && empName !== "__NEW_EMPLOYEE__") {
+                switchView('history');
                 setTimeout(() => loadEmployeeInquiries(empName), 1500);
             }
         })
