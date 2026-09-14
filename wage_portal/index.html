@@ -298,7 +298,7 @@
         .fieldset-title {
             font-weight: bold;
             color: var(--primary-color);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-size: 14px;
         }
 
@@ -389,7 +389,7 @@
             </select>
         </div>
 
-        <!-- אזור פניות קודמות (יוצג רק עבור עובד קיים) -->
+        <!-- אזור פניות קודמות (עבור עובד קיים בלבד) -->
         <div id="historySection" class="history-section">
             <div class="history-top-bar">
                 <span class="history-title">📑 3 פניות אחרונות שלך</span>
@@ -417,11 +417,26 @@
             <!-- שדות רישום עובד חדש (מופיעים רק כשנבחר 'עובד חדש') -->
             <div id="modalNewEmployeeFields" class="fieldset-container" style="display: none; border-color: #f39c12; background-color: #fffaf0;">
                 <div class="fieldset-title" style="color: #e67e22;">⭐ רישום עובד חדש במערכת</div>
+                
+                <div class="form-group">
+                    <label for="newEmployeeCompany">שם חברה *</label>
+                    <select id="newEmployeeCompany" name="newEmployeeCompany">
+                        <option value="פאר נשר">פאר נשר</option>
+                        <option value="פיס">פיס</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label for="newEmployeeName">שם מלא בעברית *</label>
                     <input type="text" id="newEmployeeName" name="newEmployeeName" placeholder="לדוגמה: ישראל ישראלי" oninput="validateUniqueName(this.value)">
                     <div id="nameErrorBox" style="color:red; font-size:13px; font-weight:bold; margin-top:5px; display:none;">⚠️ עובד בשם זה כבר קיים ברשימה!</div>
                 </div>
+
+                <div class="form-group">
+                    <label for="newEmployeeIdNumber">מספר תעודת זהות *</label>
+                    <input type="text" id="newEmployeeIdNumber" name="newEmployeeIdNumber" maxlength="9" placeholder="9 ספרות (ללא מקף)">
+                </div>
+
                 <div class="form-group" style="margin-bottom: 0;">
                     <label for="newEmployeeEmail">כתובת מייל לקבלת עדכונים *</label>
                     <input type="email" id="newEmployeeEmail" name="newEmployeeEmail" placeholder="user@domain.co.il">
@@ -634,14 +649,19 @@
         const modalNewEmpFields = document.getElementById("modalNewEmployeeFields");
         const newNameInput = document.getElementById("newEmployeeName");
         const newEmailInput = document.getElementById("newEmployeeEmail");
+        const newIdInput = document.getElementById("newEmployeeIdNumber");
+        const newCompanySelect = document.getElementById("newEmployeeCompany");
 
         selectedEmployeeHidden.value = name;
 
         if (name === "__NEW_EMPLOYEE__") {
-            // הפיכת שדות עובד חדש לשדות חובה והצגתם בראש הפופ-אפ
             modalNewEmpFields.style.display = "block";
             newNameInput.required = true;
             newEmailInput.required = true;
+            newIdInput.required = true;
+            if (targetCompany) {
+                newCompanySelect.value = targetCompany;
+            }
             historySection.style.display = "none";
             openNewInquiryModal();
             return;
@@ -651,6 +671,7 @@
         modalNewEmpFields.style.display = "none";
         newNameInput.required = false;
         newEmailInput.required = false;
+        newIdInput.required = false;
 
         if (!name) {
             historySection.style.display = "none";
@@ -897,8 +918,19 @@
         if (employeeSelectVal === "__NEW_EMPLOYEE__") {
             const newName = document.getElementById("newEmployeeName").value.trim();
             const newEmail = document.getElementById("newEmployeeEmail").value.trim();
+            const newCompany = document.getElementById("newEmployeeCompany").value;
+            const newId = document.getElementById("newEmployeeIdNumber").value.trim();
+
+            if (!/^\d{8,9}$/.test(newId)) {
+                alert("נא להזין מספר תעודת זהות תקין (8 או 9 ספרות).");
+                document.getElementById("newEmployeeIdNumber").focus();
+                return;
+            }
+
             formData.append("newEmployeeName", newName);
             formData.append("newEmployeeEmail", newEmail);
+            formData.append("newEmployeeCompany", newCompany);
+            formData.append("newEmployeeIdNumber", newId);
         }
 
         submitBtn.disabled = true;
