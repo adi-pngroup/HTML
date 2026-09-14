@@ -656,7 +656,7 @@
     let loggedInUser = null; 
 
     function normalizeId(val) {
-        if (!val) return '';
+        if (val === null || val === undefined) return '';
         const digits = val.toString().replace(/\D/g, '').trim();
         if (digits.length > 0 && digits.length <= 9) {
             return digits.padStart(9, '0');
@@ -675,7 +675,14 @@
         }
     }
 
-    // טעינת רשימת עובדים לאימות ישירות עם מניעת מטמון
+    // פונקציית עזר בטוחה לקריאת טקסט מתא בגיליון ללא שגיאות null
+    function safeStr(cell) {
+        if (!cell) return '';
+        if (cell.v !== null && cell.v !== undefined) return cell.v.toString().trim();
+        if (cell.f !== null && cell.f !== undefined) return cell.f.toString().trim();
+        return '';
+    }
+
     function loadAuthData() {
         if (!targetCompany) return;
         const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${EMPLOYEES_GID}&_t=${Date.now()}`;
@@ -690,13 +697,14 @@
                 employeesData = [];
                 rows.forEach(row => {
                     if (row.c && row.c[0] && row.c[0].v) {
-                        const name = row.c[0].v.toString().trim();
-                        const email = (row.c[1] && row.c[1].v) ? row.c[1].v.toString().trim().toLowerCase() : '';
-                        const company = (row.c[2] && row.c[2].v) ? row.c[2].v.toString().trim() : '';
+                        const name = safeStr(row.c[0]);
+                        const email = safeStr(row.c[1]).toLowerCase();
+                        const company = safeStr(row.c[2]);
                         
+                        // קריאה בטוחה של ת"ז/סיסמה
                         let rawPass = '';
                         if (row.c[3]) {
-                            rawPass = (row.c[3].f !== undefined && row.c[3].f !== null) ? row.c[3].f : ((row.c[3].v !== undefined) ? row.c[3].v.toString() : '');
+                            rawPass = safeStr(row.c[3]);
                         }
                         const password = normalizeId(rawPass);
 
@@ -706,7 +714,7 @@
                     }
                 });
                 isEmployeesLoaded = true;
-                console.log("Employees data loaded:", employeesData.length);
+                console.log("Employees data loaded successfully:", employeesData.length);
             })
             .catch(err => {
                 console.error("Error loading auth data:", err);
@@ -722,7 +730,6 @@
         document.getElementById("alertBox").style.display = "none";
     }
 
-    // אימות והתחברות עם הודעות שגיאה מפורטות ומדויקות
     function handleLogin(e) {
         e.preventDefault();
         const emailInput = document.getElementById("loginEmail").value.trim().toLowerCase();
@@ -734,7 +741,6 @@
             return;
         }
 
-        // חיפוש המשתמש לפי מייל
         const userByEmail = employeesData.find(u => u.email === emailInput);
 
         if (!userByEmail) {
@@ -742,13 +748,11 @@
             return;
         }
 
-        // בדיקת חברה
         if (userByEmail.company !== targetCompany) {
             showAlert(`עובד זה שייך לחברת "${userByEmail.company}", אך הפורטל פתוח עבור "${targetCompany}".`, "error");
             return;
         }
 
-        // בדיקת סיסמה (ת"ז)
         if (!userByEmail.password) {
             showAlert(`לעובד/ת ${userByEmail.name} עדיין לא הוגדרה תעודת זהות / סיסמה בעמודה D בגיליון!`, "error");
             return;
@@ -759,7 +763,6 @@
             return;
         }
 
-        // התחברות הצליחה
         document.getElementById("alertBox").style.display = "none";
         loggedInUser = {
             name: userByEmail.name,
@@ -866,10 +869,10 @@
             const messagesByInquiry = {};
             msgJson.table.rows.forEach(row => {
                 if (row.c && row.c[1] && row.c[1].v) {
-                    const inqId = row.c[1].v.toString().trim();
-                    const dateVal = (row.c[2] && row.c[2].f) ? row.c[2].f : ((row.c[2] && row.c[2].v) ? row.c[2].v : '');
-                    const sender = (row.c[3] && row.c[3].v) ? row.c[3].v.toString().trim() : 'אודליה';
-                    const content = (row.c[4] && row.c[4].v) ? row.c[4].v.toString().trim() : '';
+                    const inqId = safeStr(row.c[1]);
+                    const dateVal = safeStr(row.c[2]);
+                    const sender = safeStr(row.c[3]) || 'אודליה';
+                    const content = safeStr(row.c[4]);
 
                     if (!messagesByInquiry[inqId]) messagesByInquiry[inqId] = [];
                     messagesByInquiry[inqId].push({ date: dateVal, sender, content });
@@ -879,21 +882,21 @@
             const matchingInquiries = [];
             inqJson.table.rows.forEach((row, idx) => {
                 if (!row.c) return;
-                const rowEmployee = (row.c[1] && row.c[1].v) ? row.c[1].v.toString().trim() : '';
+                const rowEmployee = safeStr(row.c[1]);
                 
                 if (rowEmployee === employeeName) {
                     let inqId = '';
                     for (let i = row.c.length - 1; i >= 0; i--) {
-                        if (row.c[i] && row.c[i].v && /^\d{9,12}$/.test(row.c[i].v.toString().trim())) {
-                            inqId = row.c[i].v.toString().trim();
+                        if (row.c[i] && row.c[i].v && /^\d{9,12}$/.test(safeStr(row.c[i]))) {
+                            inqId = safeStr(row.c[i]);
                             break;
                         }
                     }
                     if (!inqId && row.c[0] && row.c[0].v) inqId = (idx + 1).toString();
 
-                    const dateCreated = (row.c[0] && (row.c[0].f || row.c[0].v)) ? (row.c[0].f || row.c[0].v) : '';
-                    const subject = (row.c[2] && row.c[2].v) ? row.c[2].v.toString().trim() : 'פנייה ללא נושא';
-                    const status = (row.c[6] && row.c[6].v) ? row.c[6].v.toString().trim() : 'פתוח';
+                    const dateCreated = safeStr(row.c[0]);
+                    const subject = safeStr(row.c[2]) || 'פנייה ללא נושא';
+                    const status = safeStr(row.c[6]) || 'פתוח';
 
                     matchingInquiries.push({
                         id: inqId,
