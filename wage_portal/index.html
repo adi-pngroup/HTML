@@ -226,6 +226,10 @@
             white-space: nowrap;
         }
 
+        .btn-reply:hover {
+            background-color: var(--primary-dark);
+        }
+
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -284,9 +288,9 @@
 
         .fieldset-container {
             border: 1px solid #e2e8f0;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 14px;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 16px;
             background-color: #fafbfc;
         }
 
@@ -294,7 +298,7 @@
             font-weight: bold;
             color: var(--primary-color);
             margin-bottom: 8px;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         .row {
@@ -321,6 +325,7 @@
             font-size: 15px;
             font-weight: bold;
             cursor: pointer;
+            transition: background-color 0.2s;
         }
 
         .btn-submit:hover {
@@ -392,10 +397,13 @@
                 <input type="text" id="newEmployeeName" name="newEmployeeName" placeholder="לדוגמה: ישראל ישראלי" oninput="validateUniqueName(this.value)">
                 <div id="nameErrorBox" style="color:red; font-size:13px; font-weight:bold; margin-top:5px; display:none;">⚠️ עובד בשם זה כבר קיים ברשימה! נא לבחור את שמך מהרשימה למעלה.</div>
             </div>
-            <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-group">
                 <label for="newEmployeeEmail">כתובת מייל לקבלת עדכונים *</label>
                 <input type="email" id="newEmployeeEmail" name="newEmployeeEmail" placeholder="user@domain.co.il">
             </div>
+            <button type="button" class="btn-submit" id="btnContinueNewEmp" onclick="proceedNewEmployee()" style="background-color: #e67e22; margin-top: 5px;">
+                המשך להגשת הבקשה ⬅️
+            </button>
         </div>
 
         <!-- אזור פניות קודמות -->
@@ -636,7 +644,6 @@
             historySection.style.display = "none";
             newNameInput.required = true;
             newEmailInput.required = true;
-            openNewInquiryModal();
             return;
         }
 
@@ -651,6 +658,34 @@
 
         historySection.style.display = "block";
         loadEmployeeInquiries(name);
+    }
+
+    // מעבר להגשת בקשה עבור עובד חדש
+    function proceedNewEmployee() {
+        const nameInput = document.getElementById("newEmployeeName");
+        const emailInput = document.getElementById("newEmployeeEmail");
+        const nameVal = nameInput.value.trim();
+        const emailVal = emailInput.value.trim();
+        const errorBox = document.getElementById("nameErrorBox");
+
+        if (!nameVal) {
+            alert("נא להזין שם מלא.");
+            nameInput.focus();
+            return;
+        }
+
+        if (errorBox.style.display === "block") {
+            alert("עובד זה כבר קיים ברשימה. נא לבחור אותו מהתפריט למעלה.");
+            return;
+        }
+
+        if (!emailVal || !emailVal.includes("@")) {
+            alert("נא להזין כתובת מייל תקינה.");
+            emailInput.focus();
+            return;
+        }
+
+        openNewInquiryModal();
     }
 
     function openNewInquiryModal() {
@@ -794,7 +829,7 @@
         }
     }
 
-    // שליחת תגובה לפנייה קיימת
+    // שליחת מענה לפנייה קיימת
     function sendReply(inquiryId) {
         const input = document.getElementById(`replyInput_${inquiryId}`);
         const btn = document.getElementById(`replyBtn_${inquiryId}`);
@@ -847,15 +882,15 @@
     function validateUniqueName(typedName) {
         const trimmed = typedName.trim();
         const errorBox = document.getElementById("nameErrorBox");
-        const submitBtn = document.getElementById("submitBtn");
+        const continueBtn = document.getElementById("btnContinueNewEmp");
         const nameExists = existingEmployees.some(e => e.toLowerCase() === trimmed.toLowerCase());
 
         if (nameExists && trimmed.length > 0) {
             errorBox.style.display = "block";
-            submitBtn.disabled = true;
+            if (continueBtn) continueBtn.disabled = true;
         } else {
             errorBox.style.display = "none";
-            submitBtn.disabled = false;
+            if (continueBtn) continueBtn.disabled = false;
         }
     }
 
@@ -877,14 +912,14 @@
             .replace(/'/g, '&#039;');
     }
 
-    // שליחת טופס פנייה חדשה מתוך המודאל
+    // שליחת טופס פנייה חדשה
     document.getElementById("payrollForm").addEventListener("submit", function(e) {
         e.preventDefault();
         const form = e.target;
         const submitBtn = document.getElementById("submitBtn");
         const formData = new FormData(form);
 
-        // הוספת פרטי עובד חדש במידה ונבחרה אופציית רישום עובד חדש
+        // הוספת פרטי עובד חדש במידה ונבחרה אפשרות זו
         const employeeSelectVal = document.getElementById("employeeName").value;
         if (employeeSelectVal === "__NEW_EMPLOYEE__") {
             const newName = document.getElementById("newEmployeeName").value.trim();
