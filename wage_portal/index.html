@@ -62,6 +62,7 @@
 
         input[type="text"],
         input[type="email"],
+        input[type="password"],
         select,
         textarea {
             width: 100%;
@@ -84,7 +85,41 @@
             min-height: 90px;
         }
 
-        /* לשוניות ניווט ברורות */
+        /* סרגל משתמש מחובר */
+        .user-welcome-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f0f7ff;
+            border: 1px solid #cce3fd;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .user-welcome-text {
+            font-size: 15px;
+            color: #1e3a8a;
+        }
+
+        .btn-logout {
+            background-color: transparent;
+            color: #c0392b;
+            border: 1px solid #c0392b;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background-color: #c0392b;
+            color: white;
+        }
+
+        /* לשוניות ניווט */
         .portal-tabs {
             display: flex;
             gap: 10px;
@@ -121,10 +156,10 @@
             box-shadow: 0 3px 8px rgba(74, 144, 226, 0.25);
         }
 
-        /* אזור פניות קודמות */
+        /* כרטיסיות פניות */
         .history-section {
             margin: 10px 0 20px 0;
-            display: none;
+            display: block;
         }
 
         .inquiry-card {
@@ -134,11 +169,6 @@
             margin-bottom: 16px;
             background-color: #ffffff;
             box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-            transition: box-shadow 0.2s;
-        }
-
-        .inquiry-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
         }
 
         .inquiry-top {
@@ -237,7 +267,6 @@
             font-size: 13px;
             cursor: pointer;
             white-space: nowrap;
-            transition: background-color 0.2s;
         }
 
         .btn-reply:hover {
@@ -293,7 +322,6 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s;
         }
 
         .btn-submit:hover {
@@ -320,47 +348,30 @@
             display: none;
         }
 
-        .alert-success {
-            background-color: #e8f8f5;
-            color: var(--success-color);
-            border: 1px solid var(--success-color);
-        }
+        .alert-success { background-color: #e8f8f5; color: var(--success-color); border: 1px solid var(--success-color); }
+        .alert-error { background-color: #fceae8; color: var(--error-color); border: 1px solid var(--error-color); }
 
-        .alert-error {
-            background-color: #fceae8;
-            color: var(--error-color);
-            border: 1px solid var(--error-color);
-        }
-
-        .company-selection-screen {
-            text-align: center;
-            padding: 15px 10px;
-        }
-        .company-btn-grid {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .company-choice-btn {
-            flex: 1;
-            padding: 14px 10px;
-            font-size: 16px;
-            text-decoration: none;
-            color: white;
-            border-radius: 8px;
-            font-weight: bold;
-            display: block;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-        }
+        .company-selection-screen { text-align: center; padding: 15px 10px; }
+        .company-btn-grid { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+        .company-choice-btn { flex: 1; padding: 14px 10px; font-size: 16px; text-decoration: none; color: white; border-radius: 8px; font-weight: bold; display: block; }
         .btn-peernesher { background-color: #2980b9; }
         .btn-pais { background-color: #8e44ad; }
+        
+        .link-toggle {
+            color: var(--primary-color);
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
 <div class="portal-wrapper">
-    <!-- מסך בחירת חברה כשאין פרמטר ב-URL -->
+    <!-- מסך בחירת חברה (במידה ואין פרמטר בקישור) -->
     <div id="noCompanyBlock" class="company-selection-screen" style="display: none;">
         <h2>פורטל שכר - ריכוז בקשות</h2>
         <p>לא נבחרה חברה. אנא בחר/י את החברה שלך כדי להמשיך:</p>
@@ -372,189 +383,217 @@
 
     <div id="portalMainContent">
         <h2 id="portalHeader">פורטל שכר</h2>
-        
         <div id="alertBox" class="alert-message"></div>
 
-        <!-- בחירת עובד -->
-        <div class="form-group">
-            <label for="employeeName">שם העובד/ת *</label>
-            <select id="employeeName" name="employeeName" required onchange="onEmployeeSelected(this.value)">
-                <option value="">-- טוען רשימת עובדים... --</option>
-            </select>
+        <!-- מסך 1: התחברות (Login) מאובטחת -->
+        <div id="loginBlock" class="fieldset-container">
+            <div class="fieldset-title" style="font-size: 16px; margin-bottom: 15px;">🔐 כניסה לפורטל שכר</div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginEmail">שם משתמש (כתובת מייל) *</label>
+                    <input type="email" id="loginEmail" required placeholder="user@domain.co.il">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">סיסמה (מספר תעודת זהות) *</label>
+                    <input type="password" id="loginPassword" required placeholder="הזן מספר תעודת זהות (9 ספרות)">
+                </div>
+                <button type="submit" class="btn-submit" id="loginBtn">התחברות למערכת ⬅️</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 15px;">
+                <span class="link-toggle" onclick="toggleNewUserMode(true)">⭐ עובד חדש? לחץ כאן להרשמה ופתיחת פנייה ראשונה</span>
+            </div>
         </div>
 
-        <!-- רישום עובד חדש (מוצג רק בבחירת 'עובד חדש') -->
-        <div id="newEmployeeSection" class="fieldset-container" style="display: none; border-color: #f39c12; background-color: #fffaf0;">
-            <div class="fieldset-title" style="color: #e67e22;">⭐ רישום עובד חדש במערכת</div>
-            <p style="margin: 0 0 12px 0; font-size: 13px; color: #666;">השם שלך לא מופיע ברשימה? מלא את פרטייך והמערכת תעדכן אותך אוטומטית להבא.</p>
+        <!-- מסך 2: הרשמת עובד חדש (מוסתר כברירת מחדל) -->
+        <div id="registerBlock" class="fieldset-container" style="display: none; border-color: #f39c12; background-color: #fffaf0;">
+            <div class="fieldset-title" style="color: #e67e22; font-size: 16px; margin-bottom: 12px;">⭐ רישום עובד חדש במערכת</div>
+            <p style="margin: 0 0 12px 0; font-size: 13px; color: #666;">לאחר מילוי הפרטים, תוכל/י לפתוח פנייה ראשונה והפרטים יישמרו להבא.</p>
             
-            <div class="form-group">
-                <label for="newEmployeeCompany">שם חברה *</label>
-                <select id="newEmployeeCompany" name="newEmployeeCompany">
-                    <option value="פאר נשר">פאר נשר</option>
-                    <option value="פיס">פיס</option>
-                </select>
-            </div>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="regCompany">שם חברה *</label>
+                    <select id="regCompany" required>
+                        <option value="פאר נשר">פאר נשר</option>
+                        <option value="פיס">פיס</option>
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <label for="newEmployeeName">שם מלא בעברית *</label>
-                <input type="text" id="newEmployeeName" name="newEmployeeName" placeholder="לדוגמה: ישראל ישראלי" oninput="validateUniqueName(this.value)">
-                <div id="nameErrorBox" style="color:red; font-size:13px; font-weight:bold; margin-top:5px; display:none;">⚠️ עובד בשם זה כבר קיים ברשימה! נא לבחור את שמך מהרשימה למעלה.</div>
-            </div>
+                <div class="form-group">
+                    <label for="regName">שם מלא בעברית *</label>
+                    <input type="text" id="regName" required placeholder="לדוגמה: ישראל ישראלי" oninput="validateUniqueName(this.value)">
+                    <div id="nameErrorBox" style="color:red; font-size:13px; font-weight:bold; margin-top:5px; display:none;">⚠️ עובד בשם זה כבר רשום! התחבר/י דרך מסך הכניסה.</div>
+                </div>
 
-            <div class="form-group">
-                <label for="newEmployeeIdNumber">מספר תעודת זהות *</label>
-                <input type="text" id="newEmployeeIdNumber" name="newEmployeeIdNumber" maxlength="9" placeholder="9 ספרות (ללא מקף)">
-            </div>
+                <div class="form-group">
+                    <label for="regId">מספר תעודת זהות (ישמש כסיסמה) *</label>
+                    <input type="text" id="regId" required maxlength="9" placeholder="9 ספרות (ללא מקף)">
+                </div>
 
-            <div class="form-group" style="margin-bottom: 0;">
-                <label for="newEmployeeEmail">כתובת מייל לקבלת עדכונים *</label>
-                <input type="email" id="newEmployeeEmail" name="newEmployeeEmail" placeholder="user@domain.co.il">
+                <div class="form-group">
+                    <label for="regEmail">כתובת מייל (תשמש כשם המשתמש) *</label>
+                    <input type="email" id="regEmail" required placeholder="user@domain.co.il">
+                </div>
+
+                <button type="submit" class="btn-submit" id="regBtn" style="background-color: #e67e22;">המשך למילוי פנייה חדשה ⬅️</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 15px;">
+                <span class="link-toggle" onclick="toggleNewUserMode(false)">🔙 חזרה למסך התחברות</span>
             </div>
         </div>
 
-        <!-- תפריט הלשוניות (Tabs) המקורי -->
-        <div id="tabsContainer" class="portal-tabs" style="display: none;">
-            <button type="button" class="portal-tab-btn active" id="tabHistoryBtn" onclick="switchView('history')">
-                💬 התכתבויות קודמות
-            </button>
-            <button type="button" class="portal-tab-btn" id="tabNewBtn" onclick="switchView('new')">
-                ➕ פתיחת פנייה חדשה
-            </button>
+        <!-- אזור הפורטל הראשי (נחשף רק לאחר התחברות / רישום) -->
+        <div id="portalDashboard" style="display: none;">
+            <!-- פס עליון עם שם העובד וכפתור התנתקות -->
+            <div class="user-welcome-bar">
+                <span class="user-welcome-text">שלום, <b id="loggedInUserName"></b> 👋</span>
+                <button type="button" class="btn-logout" onclick="logout()">התנתק 🚪</button>
+            </div>
+
+            <!-- תפריט לשוניות (Tabs) -->
+            <div id="tabsContainer" class="portal-tabs">
+                <button type="button" class="portal-tab-btn active" id="tabHistoryBtn" onclick="switchView('history')">
+                    💬 התכתבויות קודמות
+                </button>
+                <button type="button" class="portal-tab-btn" id="tabNewBtn" onclick="switchView('new')">
+                    ➕ פתיחת פנייה חדשה
+                </button>
+            </div>
+
+            <!-- לשונית 1: אזור פניות קודמות -->
+            <div id="historySection" class="history-section">
+                <div id="inquiriesContainer">
+                    <div style="text-align: center; color: #7f8c8d; font-size: 13px; padding: 15px;">טוען פניות... ⏳</div>
+                </div>
+            </div>
+
+            <!-- לשונית 2: טופס פתיחת פנייה חדשה -->
+            <form id="payrollForm" enctype="multipart/form-data">
+                <input type="hidden" id="company" name="company" value="">
+                <input type="hidden" id="selectedEmployeeHidden" name="employeeName" value="">
+                
+                <div class="fieldset-title" style="font-size: 16px; margin-bottom: 16px;">📝 מילוי פרטי הפנייה</div>
+
+                <div class="form-group">
+                    <label for="requestSubject">נושא הבקשה *</label>
+                    <select id="requestSubject" name="requestSubject" required onchange="toggleSections()">
+                        <option value="">-- נא לבחור נושא --</option>
+                        <option value="טופס 106">טופס 106</option>
+                        <option value="תלוש שכר">בקשת תלושי שכר</option>
+                        <option value="הערה / בקשה כללית">הערה / בקשה כללית</option>
+                    </select>
+                </div>
+
+                <div id="section106" class="fieldset-container" style="display: none;">
+                    <div class="fieldset-title">פרטי בקשת טופס 106</div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="form106StartYear">משנה</label>
+                            <select id="form106StartYear" name="form106StartYear">
+                                <option value="">בחר שנה</option>
+                                <option value="2026">2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                                <option value="2022">2022</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="form106EndYear">עד שנה</label>
+                            <select id="form106EndYear" name="form106EndYear">
+                                <option value="">בחר שנה</option>
+                                <option value="2026">2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                                <option value="2022">2022</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sectionSlips" class="fieldset-container" style="display: none;">
+                    <div class="fieldset-title">פרטי בקשת תלושי שכר</div>
+                    <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: bold;">מחודש ושנה:</p>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <div class="col">
+                            <select id="slipStartMonth" name="slipStartMonth">
+                                <option value="">חודש</option>
+                                <option value="01">ינואר (01)</option>
+                                <option value="02">פברואר (02)</option>
+                                <option value="03">מרץ (03)</option>
+                                <option value="04">אפריל (04)</option>
+                                <option value="05">מאי (05)</option>
+                                <option value="06">יוני (06)</option>
+                                <option value="07">יולי (07)</option>
+                                <option value="08">אוגוסט (08)</option>
+                                <option value="09">ספטמבר (09)</option>
+                                <option value="10">אוקטובר (10)</option>
+                                <option value="11">נובמבר (11)</option>
+                                <option value="12">דצמבר (12)</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <select id="slipStartYear" name="slipStartYear">
+                                <option value="">שנה</option>
+                                <option value="2026">2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <p style="margin: 10px 0 8px 0; font-size: 13px; font-weight: bold;">עד חודש ושנה:</p>
+                    <div class="row">
+                        <div class="col">
+                            <select id="slipEndMonth" name="slipEndMonth">
+                                <option value="">חודש</option>
+                                <option value="01">ינואר (01)</option>
+                                <option value="02">פברואר (02)</option>
+                                <option value="03">מרץ (03)</option>
+                                <option value="04">אפריל (04)</option>
+                                <option value="05">מאי (05)</option>
+                                <option value="06">יוני (06)</option>
+                                <option value="07">יולי (07)</option>
+                                <option value="08">אוגוסט (08)</option>
+                                <option value="09">ספטמבר (09)</option>
+                                <option value="10">אוקטובר (10)</option>
+                                <option value="11">נובמבר (11)</option>
+                                <option value="12">דצמבר (12)</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <select id="slipEndYear" name="slipEndYear">
+                                <option value="">שנה</option>
+                                <option value="2026">2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="generalRequests">תוכן הבקשה / פירוט נוסף *</label>
+                    <textarea id="generalRequests" name="generalRequests" required placeholder="פרט כאן את בקשתך..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>צירוף מסמכים / קבצים (עד 3 קבצים)</label>
+                    <div class="file-inputs">
+                        <input type="file" name="file1">
+                        <input type="file" name="file2">
+                        <input type="file" name="file3">
+                    </div>
+                    <div class="note">ניתן לצרף קבצי PDF, תמונות וכד'.</div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">שלח בקשה</button>
+            </form>
         </div>
-
-        <!-- לשונית 1: אזור פניות קודמות -->
-        <div id="historySection" class="history-section">
-            <div id="inquiriesContainer">
-                <div style="text-align: center; color: #7f8c8d; font-size: 13px; padding: 15px;">טוען פניות... ⏳</div>
-            </div>
-        </div>
-
-        <!-- לשונית 2: טופס פתיחת פנייה חדשה -->
-        <form id="payrollForm" enctype="multipart/form-data">
-            <input type="hidden" id="company" name="company" value="">
-            <input type="hidden" id="selectedEmployeeHidden" name="employeeName" value="">
-            
-            <div class="fieldset-title" style="font-size: 16px; margin-bottom: 16px;">📝 מילוי פרטי הפנייה</div>
-
-            <div class="form-group">
-                <label for="requestSubject">נושא הבקשה *</label>
-                <select id="requestSubject" name="requestSubject" required onchange="toggleSections()">
-                    <option value="">-- נא לבחור נושא --</option>
-                    <option value="טופס 106">טופס 106</option>
-                    <option value="תלוש שכר">בקשת תלושי שכר</option>
-                    <option value="הערה / בקשה כללית">הערה / בקשה כללית</option>
-                </select>
-            </div>
-
-            <div id="section106" class="fieldset-container" style="display: none;">
-                <div class="fieldset-title">פרטי בקשת טופס 106</div>
-                <div class="row">
-                    <div class="col">
-                        <label for="form106StartYear">משנה</label>
-                        <select id="form106StartYear" name="form106StartYear">
-                            <option value="">בחר שנה</option>
-                            <option value="2026">2026</option>
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                            <option value="2022">2022</option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label for="form106EndYear">עד שנה</label>
-                        <select id="form106EndYear" name="form106EndYear">
-                            <option value="">בחר שנה</option>
-                            <option value="2026">2026</option>
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                            <option value="2022">2022</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div id="sectionSlips" class="fieldset-container" style="display: none;">
-                <div class="fieldset-title">פרטי בקשת תלושי שכר</div>
-                <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: bold;">מחודש ושנה:</p>
-                <div class="row" style="margin-bottom: 10px;">
-                    <div class="col">
-                        <select id="slipStartMonth" name="slipStartMonth">
-                            <option value="">חודש</option>
-                            <option value="01">ינואר (01)</option>
-                            <option value="02">פברואר (02)</option>
-                            <option value="03">מרץ (03)</option>
-                            <option value="04">אפריל (04)</option>
-                            <option value="05">מאי (05)</option>
-                            <option value="06">יוני (06)</option>
-                            <option value="07">יולי (07)</option>
-                            <option value="08">אוגוסט (08)</option>
-                            <option value="09">ספטמבר (09)</option>
-                            <option value="10">אוקטובר (10)</option>
-                            <option value="11">נובמבר (11)</option>
-                            <option value="12">דצמבר (12)</option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <select id="slipStartYear" name="slipStartYear">
-                            <option value="">שנה</option>
-                            <option value="2026">2026</option>
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                        </select>
-                    </div>
-                </div>
-
-                <p style="margin: 10px 0 8px 0; font-size: 13px; font-weight: bold;">עד חודש ושנה:</p>
-                <div class="row">
-                    <div class="col">
-                        <select id="slipEndMonth" name="slipEndMonth">
-                            <option value="">חודש</option>
-                            <option value="01">ינואר (01)</option>
-                            <option value="02">פברואר (02)</option>
-                            <option value="03">מרץ (03)</option>
-                            <option value="04">אפריל (04)</option>
-                            <option value="05">מאי (05)</option>
-                            <option value="06">יוני (06)</option>
-                            <option value="07">יולי (07)</option>
-                            <option value="08">אוגוסט (08)</option>
-                            <option value="09">ספטמבר (09)</option>
-                            <option value="10">אוקטובר (10)</option>
-                            <option value="11">נובמבר (11)</option>
-                            <option value="12">דצמבר (12)</option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <select id="slipEndYear" name="slipEndYear">
-                            <option value="">שנה</option>
-                            <option value="2026">2026</option>
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="generalRequests">תוכן הבקשה / פירוט נוסף *</label>
-                <textarea id="generalRequests" name="generalRequests" required placeholder="פרט כאן את בקשתך..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>צירוף מסמכים / קבצים (עד 3 קבצים)</label>
-                <div class="file-inputs">
-                    <input type="file" name="file1">
-                    <input type="file" name="file2">
-                    <input type="file" name="file3">
-                </div>
-                <div class="note">ניתן לצרף קבצי PDF, תמונות וכד'.</div>
-            </div>
-
-            <button type="submit" class="btn-submit" id="submitBtn">שלח בקשה</button>
-        </form>
     </div>
 </div>
 
@@ -582,16 +621,18 @@
         document.getElementById("company").value = targetCompany;
         document.getElementById("portalHeader").innerText = `פורטל שכר - ${targetCompany}`;
         document.title = `פורטל שכר - ${targetCompany}`;
+        const regCompanySelect = document.getElementById("regCompany");
+        if (regCompanySelect) regCompanySelect.value = targetCompany;
     }
 
-    let existingEmployees = [];
-    let currentInquiries = [];
+    let employeesData = []; // מאגר עובדים לצורך אימות (מייל + ת"ז)
+    let loggedInUser = null; // ישמור את פרטי המשתמש המחובר
 
     window.addEventListener("DOMContentLoaded", function() {
         if (!targetCompany) return;
 
+        // טעינת גיליון עובדים לצורך אימות בלבד (עמודות: A=שם, B=מייל, C=חברה, D=סיסמה/ת"ז)
         const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${EMPLOYEES_GID}`;
-        const employeeSelect = document.getElementById("employeeName");
 
         fetch(url)
             .then(res => res.text())
@@ -600,40 +641,109 @@
                 const json = JSON.parse(jsonString);
                 const rows = json.table.rows;
 
-                employeeSelect.innerHTML = '<option value="">-- נא לבחור שם מהרשימה --</option>';
-                existingEmployees = [];
-
+                employeesData = [];
                 rows.forEach(row => {
                     if (row.c && row.c[0] && row.c[0].v) {
                         const name = row.c[0].v.toString().trim();
+                        const email = (row.c[1] && row.c[1].v) ? row.c[1].v.toString().trim().toLowerCase() : '';
                         const company = (row.c[2] && row.c[2].v) ? row.c[2].v.toString().trim() : '';
+                        const password = (row.c[3] && row.c[3].v) ? row.c[3].v.toString().trim() : '';
+
                         if (name && !name.includes("שם עובד")) {
-                            if (company === targetCompany) {
-                                existingEmployees.push(name);
-                            }
+                            employeesData.push({ name, email, company, password });
                         }
                     }
                 });
-
-                existingEmployees.sort((a, b) => a.localeCompare(b, 'he'));
-
-                const newEmpOption = document.createElement("option");
-                newEmpOption.value = "__NEW_EMPLOYEE__";
-                newEmpOption.textContent = "⭐ עובד חדש / השם שלי לא מופיע";
-                employeeSelect.appendChild(newEmpOption);
-
-                existingEmployees.forEach(name => {
-                    const opt = document.createElement("option");
-                    opt.value = name;
-                    opt.textContent = name;
-                    employeeSelect.appendChild(opt);
-                });
             })
-            .catch(err => {
-                console.error("Error loading employees:", err);
-                employeeSelect.innerHTML = '<option value="">שגיאה בטעינת רשימת עובדים</option>';
-            });
+            .catch(err => console.error("Error pre-loading auth data:", err));
     });
+
+    // מעבר בין התחברות לרישום
+    function toggleNewUserMode(isNew) {
+        document.getElementById("loginBlock").style.display = isNew ? "none" : "block";
+        document.getElementById("registerBlock").style.display = isNew ? "block" : "none";
+        document.getElementById("alertBox").style.display = "none";
+    }
+
+    // אימות והתחברות (Login)
+    function handleLogin(e) {
+        e.preventDefault();
+        const emailInput = document.getElementById("loginEmail").value.trim().toLowerCase();
+        const passInput = document.getElementById("loginPassword").value.trim();
+
+        const match = employeesData.find(u => 
+            u.email === emailInput && 
+            u.password === passInput && 
+            u.company === targetCompany
+        );
+
+        if (!match) {
+            showAlert("פרטי הכניסה שגויים או שאינך רשום/ה בחברה זו. נא לבדוק את המייל והסיסמה.", "error");
+            return;
+        }
+
+        // התחברות בהצלחה
+        loggedInUser = {
+            name: match.name,
+            email: match.email,
+            company: match.company,
+            isNew: false
+        };
+
+        activateUserSession();
+    }
+
+    // רישום עובד חדש
+    function handleRegister(e) {
+        e.preventDefault();
+        const regName = document.getElementById("regName").value.trim();
+        const regEmail = document.getElementById("regEmail").value.trim().toLowerCase();
+        const regId = document.getElementById("regId").value.trim();
+        const regCompany = document.getElementById("regCompany").value;
+
+        if (!/^\d{8,9}$/.test(regId)) {
+            alert("נא להזין מספר תעודת זהות תקין (8 או 9 ספרות).");
+            return;
+        }
+
+        loggedInUser = {
+            name: regName,
+            email: regEmail,
+            password: regId,
+            company: regCompany,
+            isNew: true
+        };
+
+        activateUserSession();
+    }
+
+    // הפעלת ממשק המשתמש לאחר כניסה
+    function activateUserSession() {
+        document.getElementById("loginBlock").style.display = "none";
+        document.getElementById("registerBlock").style.display = "none";
+        document.getElementById("portalDashboard").style.display = "block";
+        document.getElementById("loggedInUserName").innerText = loggedInUser.name;
+        document.getElementById("selectedEmployeeHidden").value = loggedInUser.isNew ? "__NEW_EMPLOYEE__" : loggedInUser.name;
+
+        if (loggedInUser.isNew) {
+            // משתמש חדש מועבר ישירות ללשונית מילוי פנייה חדשה
+            switchView('new');
+            document.getElementById("inquiriesContainer").innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 14px; padding: 25px;">ברוך הבא! אין פניות קודמות. מוזמן לפתוח פנייה חדשה בלשונית למעלה!</div>';
+        } else {
+            // משתמש קיים טוען את 3 הפניות שלו
+            switchView('history');
+            loadEmployeeInquiries(loggedInUser.name);
+        }
+    }
+
+    function logout() {
+        loggedInUser = null;
+        document.getElementById("portalDashboard").style.display = "none";
+        document.getElementById("loginBlock").style.display = "block";
+        document.getElementById("loginForm").reset();
+        document.getElementById("registerForm").reset();
+        showAlert("התנתקת בהצלחה מהמערכת.", "success");
+    }
 
     // מעבר בין לשוניות (Tabs)
     function switchView(viewName) {
@@ -655,53 +765,7 @@
         }
     }
 
-    // בחירת עובד מה-Dropdown
-    function onEmployeeSelected(name) {
-        const tabsContainer = document.getElementById("tabsContainer");
-        const historySection = document.getElementById("historySection");
-        const payrollForm = document.getElementById("payrollForm");
-        const newEmpSection = document.getElementById("newEmployeeSection");
-        const selectedEmployeeHidden = document.getElementById("selectedEmployeeHidden");
-        const newNameInput = document.getElementById("newEmployeeName");
-        const newEmailInput = document.getElementById("newEmployeeEmail");
-        const newIdInput = document.getElementById("newEmployeeIdNumber");
-        const newCompanySelect = document.getElementById("newEmployeeCompany");
-
-        selectedEmployeeHidden.value = name;
-
-        if (name === "__NEW_EMPLOYEE__") {
-            newEmpSection.style.display = "block";
-            tabsContainer.style.display = "none";
-            historySection.style.display = "none";
-            payrollForm.style.display = "block"; // מציג מיד את טופס הפנייה למילוי
-            newNameInput.required = true;
-            newEmailInput.required = true;
-            newIdInput.required = true;
-            if (targetCompany) {
-                newCompanySelect.value = targetCompany;
-            }
-            return;
-        }
-
-        newEmpSection.style.display = "none";
-        newNameInput.required = false;
-        newEmailInput.required = false;
-        newIdInput.required = false;
-
-        if (!name) {
-            tabsContainer.style.display = "none";
-            historySection.style.display = "none";
-            payrollForm.style.display = "none";
-            return;
-        }
-
-        // עובד קיים נבחר: מציגים לשוניות ופותחים פניות קודמות כברירת מחדל
-        tabsContainer.style.display = "flex";
-        switchView('history');
-        loadEmployeeInquiries(name);
-    }
-
-    // טעינת פניות והודעות של העובד
+    // טעינת פניות של העובד המחובר בלבד
     function loadEmployeeInquiries(employeeName) {
         const container = document.getElementById("inquiriesContainer");
         container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 13px; padding: 20px;">טוען היסטוריית פניות... ⏳</div>';
@@ -717,7 +781,6 @@
             const inqJson = JSON.parse(inquiriesTxt.substring(inquiriesTxt.indexOf('{'), inquiriesTxt.lastIndexOf('}') + 1));
             const msgJson = JSON.parse(messagesTxt.substring(messagesTxt.indexOf('{'), messagesTxt.lastIndexOf('}') + 1));
 
-            // בניית מילון הודעות לפי מזהה פנייה
             const messagesByInquiry = {};
             msgJson.table.rows.forEach(row => {
                 if (row.c && row.c[1] && row.c[1].v) {
@@ -731,7 +794,6 @@
                 }
             });
 
-            // סינון פניות לפי שם העובד
             const matchingInquiries = [];
             inqJson.table.rows.forEach((row, idx) => {
                 if (!row.c) return;
@@ -761,11 +823,10 @@
                 }
             });
 
-            // שמירת 3 הפניות האחרונות
-            currentInquiries = matchingInquiries.slice(-3).reverse();
+            const currentInquiries = matchingInquiries.slice(-3).reverse();
 
             if (currentInquiries.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 14px; padding: 25px;">לא נמצאו פניות קודמות. מוזמן לפתוח פנייה חדשה בלשונית למעלה!</div>';
+                container.innerHTML = '<div style="text-align: center; color: #7f8c8d; font-size: 14px; padding: 25px;">אין פניות קודמות. מוזמן לפתוח פנייה ראשונה בלשונית למעלה!</div>';
                 switchView('new');
             } else {
                 renderInquiries(currentInquiries);
@@ -773,12 +834,10 @@
         })
         .catch(err => {
             console.error("Error fetching data:", err);
-            container.innerHTML = '<div style="text-align:center; color:#e74c3c; font-size:13px; padding: 15px;">לא הצלחנו לטעון את הפניות הקודמות. ניתן לפתוח פנייה חדשה.</div>';
-            switchView('new');
+            container.innerHTML = '<div style="text-align:center; color:#e74c3c; font-size:13px; padding: 15px;">לא הצלחנו לטעון את הפניות הקודמות.</div>';
         });
     }
 
-    // הצגת הפניות במסך
     function renderInquiries(inquiries) {
         const container = document.getElementById("inquiriesContainer");
         container.innerHTML = "";
@@ -831,12 +890,10 @@
         }
     }
 
-    // שליחת תגובה לפנייה קיימת
     function sendReply(inquiryId) {
         const input = document.getElementById(`replyInput_${inquiryId}`);
         const btn = document.getElementById(`replyBtn_${inquiryId}`);
         const text = input.value.trim();
-        const employeeName = document.getElementById("employeeName").value;
 
         if (!text) {
             alert("נא להזין תוכן להודעה.");
@@ -849,7 +906,7 @@
         const payload = new FormData();
         payload.append("action", "reply");
         payload.append("inquiryId", inquiryId);
-        payload.append("employeeName", employeeName);
+        payload.append("employeeName", loggedInUser.name);
         payload.append("messageContent", text);
         payload.append("company", targetCompany);
 
@@ -861,7 +918,7 @@
             if (!res.ok) throw new Error("Error sending reply");
             input.value = "";
             showAlert("התגובה נשלחה בהצלחה! היא תופיע בהתכתבות בעוד רגע.", "success");
-            setTimeout(() => loadEmployeeInquiries(employeeName), 1500);
+            setTimeout(() => loadEmployeeInquiries(loggedInUser.name), 1500);
         })
         .catch(err => {
             console.error(err);
@@ -882,17 +939,17 @@
     }
 
     function validateUniqueName(typedName) {
-        const trimmed = typedName.trim();
+        const trimmed = typedName.trim().toLowerCase();
         const errorBox = document.getElementById("nameErrorBox");
-        const submitBtn = document.getElementById("submitBtn");
-        const nameExists = existingEmployees.some(e => e.toLowerCase() === trimmed.toLowerCase());
+        const regBtn = document.getElementById("regBtn");
+        const nameExists = employeesData.some(e => e.name.toLowerCase() === trimmed);
 
         if (nameExists && trimmed.length > 0) {
             errorBox.style.display = "block";
-            submitBtn.disabled = true;
+            regBtn.disabled = true;
         } else {
             errorBox.style.display = "none";
-            submitBtn.disabled = false;
+            regBtn.disabled = false;
         }
     }
 
@@ -921,24 +978,11 @@
         const submitBtn = document.getElementById("submitBtn");
         const formData = new FormData(form);
 
-        // הוספת פרטי עובד חדש במידה ונבחר עובד חדש
-        const employeeSelectVal = document.getElementById("employeeName").value;
-        if (employeeSelectVal === "__NEW_EMPLOYEE__") {
-            const newName = document.getElementById("newEmployeeName").value.trim();
-            const newEmail = document.getElementById("newEmployeeEmail").value.trim();
-            const newCompany = document.getElementById("newEmployeeCompany").value;
-            const newId = document.getElementById("newEmployeeIdNumber").value.trim();
-
-            if (!/^\d{8,9}$/.test(newId)) {
-                alert("נא להזין מספר תעודת זהות תקין (8 או 9 ספרות).");
-                document.getElementById("newEmployeeIdNumber").focus();
-                return;
-            }
-
-            formData.append("newEmployeeName", newName);
-            formData.append("newEmployeeEmail", newEmail);
-            formData.append("newEmployeeCompany", newCompany);
-            formData.append("newEmployeeIdNumber", newId);
+        if (loggedInUser.isNew) {
+            formData.append("newEmployeeName", loggedInUser.name);
+            formData.append("newEmployeeEmail", loggedInUser.email);
+            formData.append("newEmployeeCompany", loggedInUser.company);
+            formData.append("newEmployeeIdNumber", loggedInUser.password);
         }
 
         submitBtn.disabled = true;
@@ -953,11 +997,11 @@
             showAlert("הבקשה נשלחה בהצלחה! היא נוספה לרשימת הפניות שלך.", "success");
             form.reset();
             toggleSections();
-            const empName = document.getElementById("employeeName").value;
-            if (empName && empName !== "__NEW_EMPLOYEE__") {
-                switchView('history');
-                setTimeout(() => loadEmployeeInquiries(empName), 1500);
-            }
+            
+            loggedInUser.isNew = false;
+            document.getElementById("selectedEmployeeHidden").value = loggedInUser.name;
+            switchView('history');
+            setTimeout(() => loadEmployeeInquiries(loggedInUser.name), 1500);
         })
         .catch(err => {
             console.error(err);
